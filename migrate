@@ -1,0 +1,18 @@
+#!/usr/bin/env php
+<?php
+declare(strict_types = 1);
+
+require_once 'index.php';
+
+use kernel\helpers\Console;
+use kernel\helpers\migration\Migration;
+
+$action = 'action' . $argv[1];
+$params = array_key_exists(2, $argv) ? $argv[2] : null;
+$migration = new Migration();
+
+if (!method_exists($migration, $action)) {
+	exit (Console::writeError("Unidentified command '{$argv[1]}'"));
+}
+
+$migration->$action($params);
