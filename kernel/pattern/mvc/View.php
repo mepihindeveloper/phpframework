@@ -1,4 +1,11 @@
 <?php
+/*
+ * Copyright (c) 2020.
+ *
+ * Разработчик: Максим Епихин
+ * Twitter: https://twitter.com/maximepihin
+ */
+
 declare(strict_types = 1);
 
 namespace kernel\pattern\mvc;
@@ -26,8 +33,8 @@ class View {
 	 * @throws NotFoundHttpException
 	 */
 	public function render(string $view, array $data = null, string $layout = null) {
-		$viewFile = ROOT . "views/{$view}";
-		$viewLayout = ROOT . 'views/' . (isset($layout) ? $layout : $this->defaultLayout);
+		$viewFile = APPLICATION . "views/{$view}";
+		$viewLayout = APPLICATION . 'views/' . (isset($layout) ? $layout : $this->defaultLayout);
 		
 		if (!is_file($viewFile) || !is_file($viewLayout)) {
 			throw new NotFoundHttpException("Представление {$view} или шаблон {$layout}

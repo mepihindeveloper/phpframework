@@ -1,14 +1,21 @@
 <?php
+/*
+ * Copyright (c) 2020.
+ *
+ * Разработчик: Максим Епихин
+ * Twitter: https://twitter.com/maximepihin
+ */
+
 declare(strict_types = 1);
 
 namespace kernel;
 
-use kernel\exception\NotFoundHttpException;
 use kernel\helpers\Cookies;
 use kernel\helpers\Headers;
 use kernel\helpers\Request;
 use kernel\helpers\Session;
 use kernel\pattern\mvc\Router;
+use kernel\pattern\Registry;
 use kernel\pattern\Singleton;
 
 /**
@@ -20,33 +27,13 @@ use kernel\pattern\Singleton;
 class Application extends Singleton {
 	
 	/**
-	 * @var Config Объект класса управления конфигурацией
-	 */
-	private Config $config;
-	/**
-	 * @var Router Объект класса управления маршрутизацией
-	 */
-	private Router $router;
-	/**
-	 * @var Cookies Объект класса управления Cookies
-	 */
-	private Cookies $cookies;
-	/**
-	 * @var Headers Объект класса управления заголовками
-	 */
-	private Headers $headers;
-	/**
-	 * @var Request Объект класса управления запросами
-	 */
-	private Request $request;
-	/**
-	 * @var Session Объект класса управления сессией
-	 */
-	private Session $session;
-	/**
 	 * @var NamespaceAutoloader Объект класса автоматического загрузчика классов
 	 */
 	private NamespaceAutoloader $namespaceAutoloader;
+	private array $defaultClassFoldersMap = [
+		'classes' => ROOT . 'classes/',
+		'application' => APPLICATION,
+	];
 	
 	/**
 	 * Инициализация приложения
@@ -55,7 +42,8 @@ class Application extends Singleton {
 	 *
 	 * @return void
 	 *
-	 * @throws NotFoundHttpException
+	 * @throws exception\ServerErrorHttpException
+	 * @throws exception\InvalidDataHttpException
 	 */
 	public function run(NamespaceAutoloader $namespaceAutoloader): void {
 		if (!isset($this->namespaceAutoloader)) {
@@ -63,17 +51,8 @@ class Application extends Singleton {
 			$this->autoload($this);
 		}
 		
-		$this->config = $this->config ?? Config::getInstance();
-		
-		if (!ISCLI) {
-			$this->cookies = $this->cookies ?? Cookies::getInstance();
-			$this->headers = $this->headers ?? Headers::getInstance();
-			$this->session = $this->session ?? Session::getInstance();
-			$this->request = $this->request ?? Request::getInstance();
-			
-			$this->router = $this->router ?? new Router();
-			$this->router->init();
-		}
+		Registry::getInstance()->init();
+		Registry::getInstance()->get('router')->init();
 	}
 	
 	/**
@@ -84,8 +63,10 @@ class Application extends Singleton {
 	 * @return void
 	 */
 	private function autoload(Application $application): void {
-		$application->namespaceAutoloader->add('classes', ROOT . 'classes/');
-		$application->namespaceAutoloader->add('controllers', ROOT . 'controllers/');
+		foreach ($this->defaultClassFoldersMap as $namespace => $root) {
+			$application->namespaceAutoloader->add($namespace, $root);
+		}
+		
 		$application->namespaceAutoloader->register();
 	}
 	
@@ -93,54 +74,60 @@ class Application extends Singleton {
 	 * Возвращает Объект класса управления конфигурацией
 	 *
 	 * @return Config
+	 * @throws exception\InvalidDataHttpException
 	 */
 	public function getConfig(): Config {
-		return $this->config;
+		return Registry::getInstance()->get('config');
 	}
 	
 	/**
 	 * Возврщает объект класса управления маршрутизацией
 	 *
 	 * @return Router
+	 * @throws exception\InvalidDataHttpException
 	 */
 	public function getRouter(): Router {
-		return $this->router;
+		return Registry::getInstance()->get('router');
 	}
 	
 	/**
 	 * Возвращает объект класса управления Cookies
 	 *
 	 * @return Cookies
+	 * @throws exception\InvalidDataHttpException
 	 */
 	public function getCookies(): Cookies {
-		return $this->cookies;
+		return Registry::getInstance()->get('cookies');
 	}
 	
 	/**
 	 * Возвращает объект класса управления заголовками
 	 *
 	 * @return Headers
+	 * @throws exception\InvalidDataHttpException
 	 */
 	public function getHeaders(): Headers {
-		return $this->headers;
+		return Registry::getInstance()->get('headers');
 	}
 	
 	/**
 	 * Возвращает объект класса управления запросами
 	 *
 	 * @return Request
+	 * @throws exception\InvalidDataHttpException
 	 */
 	public function getRequest(): Request {
-		return $this->request;
+		return Registry::getInstance()->get('request');
 	}
 	
 	/**
 	 * Возращает объект класса управления сессией
 	 *
 	 * @return Session
+	 * @throws exception\InvalidDataHttpException
 	 */
 	public function getSession(): Session {
-		return $this->session;
+		return Registry::getInstance()->get('session');
 	}
 	
 	/**
