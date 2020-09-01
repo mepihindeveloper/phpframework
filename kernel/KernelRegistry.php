@@ -8,9 +8,8 @@
 
 declare(strict_types = 1);
 
-namespace kernel\pattern;
+namespace kernel;
 
-use kernel\Config;
 use kernel\exception\InvalidDataHttpException;
 use kernel\exception\ServerErrorHttpException;
 use kernel\helpers\Cookies;
@@ -18,6 +17,7 @@ use kernel\helpers\Headers;
 use kernel\helpers\Request;
 use kernel\helpers\Session;
 use kernel\pattern\mvc\Router;
+use kernel\pattern\Singleton;
 
 /**
  * Класс, реализуйщий шаблон проектирования "Реестр" (Registry).
@@ -25,16 +25,12 @@ use kernel\pattern\mvc\Router;
  *
  * @package kernel\pattern
  */
-class Registry extends Singleton {
+class KernelRegistry extends pattern\registry\Registry {
 	
-	/**
-	 * @var array Пользовательские компоненты
-	 */
-	protected static array $objects = [];
 	/**
 	 * @var array Компоненты ядра
 	 */
-	protected static array $kernelObjects = [];
+	private static array $kernelObjects = [];
 	/**
 	 * @var array|string[] Список компонентов ядра первичной инициализации
 	 */

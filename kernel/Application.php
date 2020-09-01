@@ -15,7 +15,6 @@ use kernel\helpers\Headers;
 use kernel\helpers\Request;
 use kernel\helpers\Session;
 use kernel\pattern\mvc\Router;
-use kernel\pattern\Registry;
 use kernel\pattern\Singleton;
 
 /**
@@ -51,8 +50,8 @@ class Application extends Singleton {
 			$this->autoload($this);
 		}
 		
-		Registry::getInstance()->init();
-		Registry::getInstance()->get('router')->init();
+		KernelRegistry::getInstance()->init();
+		KernelRegistry::getInstance()->get('router')->init();
 	}
 	
 	/**
@@ -77,7 +76,7 @@ class Application extends Singleton {
 	 * @throws exception\InvalidDataHttpException
 	 */
 	public function getConfig(): Config {
-		return Registry::getInstance()->get('config');
+		return KernelRegistry::getInstance()->get('config');
 	}
 	
 	/**
@@ -87,7 +86,7 @@ class Application extends Singleton {
 	 * @throws exception\InvalidDataHttpException
 	 */
 	public function getRouter(): Router {
-		return Registry::getInstance()->get('router');
+		return KernelRegistry::getInstance()->get('router');
 	}
 	
 	/**
@@ -97,7 +96,7 @@ class Application extends Singleton {
 	 * @throws exception\InvalidDataHttpException
 	 */
 	public function getCookies(): Cookies {
-		return Registry::getInstance()->get('cookies');
+		return KernelRegistry::getInstance()->get('cookies');
 	}
 	
 	/**
@@ -107,7 +106,7 @@ class Application extends Singleton {
 	 * @throws exception\InvalidDataHttpException
 	 */
 	public function getHeaders(): Headers {
-		return Registry::getInstance()->get('headers');
+		return KernelRegistry::getInstance()->get('headers');
 	}
 	
 	/**
@@ -117,7 +116,7 @@ class Application extends Singleton {
 	 * @throws exception\InvalidDataHttpException
 	 */
 	public function getRequest(): Request {
-		return Registry::getInstance()->get('request');
+		return KernelRegistry::getInstance()->get('request');
 	}
 	
 	/**
@@ -127,7 +126,7 @@ class Application extends Singleton {
 	 * @throws exception\InvalidDataHttpException
 	 */
 	public function getSession(): Session {
-		return Registry::getInstance()->get('session');
+		return KernelRegistry::getInstance()->get('session');
 	}
 	
 	/**
