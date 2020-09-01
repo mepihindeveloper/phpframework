@@ -1,4 +1,11 @@
 <?php
+/*
+ * Copyright (c) 2020.
+ *
+ * Разработчик: Максим Епихин
+ * Twitter: https://twitter.com/maximepihin
+ */
+
 declare(strict_types = 1);
 
 namespace kernel\pattern\mvc;
@@ -7,6 +14,7 @@ use kernel\Config;
 use kernel\exception\InvalidDataHttpException;
 use kernel\exception\NotFoundHttpException;
 use kernel\exception\ServerErrorHttpException;
+use kernel\pattern\Singleton;
 
 /**
  * Class Router
@@ -39,7 +47,7 @@ use kernel\exception\ServerErrorHttpException;
  * @package kernel\pattern\mvc
  * @property Controller controller
  */
-class Router {
+class Router extends Singleton {
 	
 	/**
 	 * @var string|null Наименование модуля по умолчанию
@@ -276,7 +284,7 @@ class Router {
 	 * @return string
 	 */
 	private function getControllerFile(): string {
-		return (ROOT . 'controllers/' . $this->moduleName . $this->controllerName . '.php');
+		return (APPLICATION . 'controllers/' . $this->moduleName . $this->controllerName . '.php');
 	}
 	
 	/**
