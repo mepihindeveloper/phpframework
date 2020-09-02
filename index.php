@@ -22,9 +22,7 @@ $root = ISCLI ? getenv('PWD') : $_SERVER['DOCUMENT_ROOT'];
 defined('ROOT') or define('ROOT', "{$root}/");
 defined('APPLICATION') or define('APPLICATION', "{$root}/application/");
 
-$vendor = file_exists('vendor') ? require_once 'vendor/autoload.php' : null;
-
 require_once 'kernel/NamespaceAutoloader.php';
 
-$namespaceAutoloader = new NamespaceAutoloader($vendor);
+$namespaceAutoloader = new NamespaceAutoloader();
 Application::getInstance()->run($namespaceAutoloader);
