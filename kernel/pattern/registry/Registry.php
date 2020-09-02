@@ -34,9 +34,15 @@ class Registry extends Singleton implements RegistryInterface {
 	 * @throws ServerErrorHttpException
 	 */
 	public function init(): void {
-		foreach (Config::getInstance()->getSection('components') as $name => $class) {
-			self::$objects[$name] = is_subclass_of($class, Singleton::class) ?
-				$class::getInstance() : new $class;
+		foreach (Config::getInstance()->getSection('components') as $name => $value) {
+			self::$objects[$name] = is_subclass_of($value['class'], Singleton::class) ?
+				$value['class']::getInstance() : new $value['class'];
+			
+			if (array_key_exists('params', $value)) {
+				foreach ($value['params'] as $property => $propertyValue) {
+					self::$objects[$name]->$property = $propertyValue;
+				}
+			}
 		}
 	}
 	
