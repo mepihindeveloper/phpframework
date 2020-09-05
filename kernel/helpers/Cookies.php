@@ -25,11 +25,11 @@ class Cookies extends Singleton {
 	/**
 	 * @var array Конфигурация cookie
 	 */
-	private array $cookieSettings = [];
+	private array $cookieSettings;
 	/**
 	 * @var array Cookie
 	 */
-	private array $cookie = [];
+	private array $cookie;
 	
 	protected function __construct() {
 		$this->cookieSettings = Config::getInstance()->getActiveSettings('cookies');
@@ -195,11 +195,11 @@ class Cookies extends Singleton {
 	 * @throws InvalidDataHttpException
 	 */
 	public function add(): void {
-		if (!array_key_exists('name', $this->cookie)) {
-			throw new InvalidDataHttpException('Отсутствует название cookie');
-		}
-		
 		foreach ($this->cookie as $cookie) {
+			if (!array_key_exists('name', $cookie)) {
+				throw new InvalidDataHttpException('Отсутствует название cookie');
+			}
+			
 			$cookieParams = [
 				'name' => $cookie['name'],
 				'value' => $cookie['value']

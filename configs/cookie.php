@@ -23,5 +23,12 @@ return [
 		'secure' => isset($_SERVER['HTTPS']),
 		'httponly' => true
 	],
+	'session' => [
+		'expire' => time() + (86400 * 30), // 86400 - 1 день
+		'path' => ini_get('session.cookie_path'),
+		'domain' => ini_get('session.cookie_domain'),
+		'secure' => isset($_SERVER['HTTPS']),
+		'httponly' => true
+	],
 	'active' => 'default'
 ];

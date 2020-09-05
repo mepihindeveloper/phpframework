@@ -21,8 +21,8 @@
  * Размещенеи маршрутов предполгается по логике от более строгих к более общим
  */
 return [
-	'^(?<module>[a-z-]+)\/(?<controller>[a-z-]+)\/(?<action>[a-z-]*)',
-	'^(?<controller>[a-z-]+)\/(?<action>[a-z-]*)',
-	'^(?<controller>[a-z-]+)',
+	'^(?<module>[a-z-0-9]+)\/(?<controller>[a-z-0-9]+)\/(?<action>[a-z-0-9]*)',
+	'^(?<controller>[a-z-0-9]+)\/(?<action>[a-z-0-9]*)',
+	'^(?<controller>[a-z-0-9]+)',
 	'^$'
 ];

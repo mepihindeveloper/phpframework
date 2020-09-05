@@ -11,6 +11,7 @@ declare(strict_types = 1);
 namespace kernel\helpers;
 
 use kernel\Application;
+use kernel\exception\InvalidDataHttpException;
 use kernel\exception\ServerErrorHttpException;
 use kernel\exception\SessionErrorHttpException;
 use kernel\pattern\Singleton;
@@ -36,59 +37,53 @@ class Session extends Singleton {
 	 */
 	private array $activeSettings;
 	/**
-	 * @var int Время жизни сессии при бездействии в секундах
+	 * @var string Время жизни сессии при бездействии в секундах
 	 */
-	private int $inactionLifeTime;
+	private string $inactionLifeTime;
 	/**
-	 * @var int Время жизни идентификатора сессии в секундах
+	 * @var string Время жизни идентификатора сессии в секундах
 	 */
-	private int $idLifeTime;
+	private string $idLifeTime;
 	/**
-	 * @var int Время жизни сессии в секундах
+	 * @var string Время жизни сессии в секундах
 	 */
-	private int $lifeTime;
+	private string $lifeTime;
 	/**
 	 * @var Application Объект класса приложения
 	 */
 	private Application $application;
 	
 	/**
-	 * @param string $name Имя сессии
-	 *
-	 * @throws ServerErrorHttpException
-	 */
-	protected function __construct(string $name = 'appsession') {
-		$this->name = $name;
-		$this->application = Application::getInstance();
-		$this->activeSettings = $this->application->getConfig()->getActiveSettings('session');
-	}
-	
-	/**
 	 * Запускает сессиию
+	 *
+	 * @param string $name
 	 *
 	 * @return void
 	 *
+	 * @throws InvalidDataHttpException
+	 * @throws ServerErrorHttpException
 	 * @throws SessionErrorHttpException
 	 * @see Session::refresh()
 	 *
 	 * @see Session::isIdExpired()
 	 * @see Session::isValid()
 	 */
-	public function open(): void {
-		$this->init();
-		session_start();
+	public function open(string $name = 'appsession'): void {
+		$this->name = $name;
+		$this->application = Application::getInstance();
+		$this->activeSettings = $this->application->getConfig()->getActiveSettings('session');
 		
-		// Проверка на корректность инициализированнйо сессии
+		$this->init();
+		
 		if (!$this->isActive()) {
 			throw new SessionErrorHttpException('Ошибка в работе сессий. Сессия не запущена');
 		}
 		
-		// Установка времени запуска сессии
 		if (!$this->hasKey('startTime')) {
 			$this->set('startTime', time());
 		}
 		
-		if ($this->isIdExpired()) {
+		if ($this->isIdExpired() || $this->isExpired()) {
 			$this->refresh();
 		}
 		
@@ -98,38 +93,47 @@ class Session extends Singleton {
 	}
 	
 	/**
-	 * Инициализирует параметры сессии
+	 * Инициализирует параметры сессии.
+	 * Указывается, что сеансы должны передаваться только с помощью файлов cookie,
+	 * исключая возможность отправки идентификатора сеанса в качестве параметра «GET».
+	 * Установка параметров cookie идентификатора сеанса. Эти параметры могут быть переопределены при инициализации
+	 * обработчика сеанса, однако рекомендуется использовать значения по умолчанию, разрешающие отправку
+	 * только по HTTPS (если имеется) и ограниченный доступ HTTP (без доступа к сценарию на стороне клиента).
 	 *
 	 * @return void
+	 * @throws InvalidDataHttpException
+	 * @throws ServerErrorHttpException
 	 */
 	private function init(): void {
-		/*
-		 * Указывается, что сеансы должны передаваться только с помощью файлов cookie,
-		 * исключая возможность отправки идентификатора сеанса в качестве параметра «GET».
-		 * Установка параметров cookie идентификатора сеанса. Эти параметры могут быть переопределены при инициализации
-		 * обработчика сеанса, однако рекомендуется использовать значения по умолчанию, разрешающие отправку
-		 * только по HTTPS (если имеется) и ограниченный доступ HTTP (без доступа к сценарию на стороне клиента).
-		 */
-		
 		$this->lifeTime = $this->activeSettings['lifeTime'];
 		$this->idLifeTime = $this->activeSettings['idLifeTime'];
 		$this->inactionLifeTime = $this->activeSettings['inactionLifeTime'];
 		
-		// Определяет, будет ли модуль использовать cookies для хранения идентификатора сессии на стороне клиента
-		ini_set('session.use_cookies', $this->activeSettings['use_cookies']);
-		// Определяет, будет ли модуль использовать только cookies для хранения идентификатора сессии на стороне клиента
-		ini_set('session.use_only_cookies', $this->activeSettings['use_only_cookies']);
 		ini_set('session.gc_maxlifetime', $this->lifeTime);
-		
 		$this->setName($this->name);
 		
-		session_set_cookie_params(
-			$this->application->getCookies()->get('lifetime'),
-			$this->application->getCookies()->get('path'),
-			$this->application->getCookies()->get('domain'),
-			$this->application->getCookies()->get('secure'),
-			$this->application->getCookies()->get('httponly')
-		);
+		if (array_key_exists('cookies', $this->activeSettings)) {
+			// Определяет, будет ли модуль использовать cookies для хранения идентификатора сессии на стороне клиента
+			if (array_key_exists('use_cookies', $this->activeSettings)) {
+				ini_set('session.use_cookies', $this->activeSettings['use_cookies']);
+			}
+			// Определяет, будет ли модуль использовать только cookies для хранения идентификатора сессии на стороне клиента
+			if (array_key_exists('use_only_cookies', $this->activeSettings)) {
+				ini_set('session.use_only_cookies', $this->activeSettings['use_only_cookies']);
+			}
+			
+			$sessionCookiesSettings = $this->application->getConfig()->getProfileSection('cookies', 'session');
+			
+			session_set_cookie_params(
+				$sessionCookiesSettings['expire'],
+				$sessionCookiesSettings['path'],
+				$sessionCookiesSettings['domain'],
+				$sessionCookiesSettings['secure'],
+				$sessionCookiesSettings['httponly']
+			);
+		}
+		
+		session_start();
 	}
 	
 	/**
@@ -184,7 +188,7 @@ class Session extends Singleton {
 	 * @throws SessionErrorHttpException
 	 */
 	public function isIdExpired(): bool {
-		if ($this->idLifeTime === 0)
+		if ($this->idLifeTime === '0')
 			return false;
 		
 		$refreshLastTime = $this->hasKey('refreshLastTime') ? $this->get('refreshLastTime') : false;
@@ -302,15 +306,14 @@ class Session extends Singleton {
 		$lastActivity = $this->hasKey('lastActivity') ? $this->get('lastActivity') : false;
 		$startTime = $this->hasKey('startTime') ? $this->get('startTime') : false;
 		$time = time();
+		$isLifeExpired = ($time - $startTime) > (int)$this->lifeTime;
+		$isInactionExpired = $lastActivity && ($time - $lastActivity) > (int)$this->inactionLifeTime;
 		
-		$isLifeExpired = ($time - $startTime) > $this->lifeTime;
-		$isInactionExpired = $lastActivity && ($time - $lastActivity) > $this->inactionLifeTime;
-		
-		if ($this->inactionLifeTime !== 0 && $this->lifeTime !== 0 && ($isInactionExpired || $isLifeExpired)) {
+		if ($this->lifeTime !== '0' && $isLifeExpired) {
 			return true;
 		}
 		
-		if (($this->lifeTime !== 0 && $isLifeExpired) || ($this->inactionLifeTime !== 0 && $isInactionExpired)) {
+		if ($this->inactionLifeTime !== '0' && $isInactionExpired) {
 			return true;
 		}
 		
@@ -324,9 +327,9 @@ class Session extends Singleton {
 	 *
 	 * @return void
 	 *
+	 * @throws InvalidDataHttpException
 	 * @throws SessionErrorHttpException
 	 * @see Session::deleteAll()
-	 *
 	 */
 	public function close(): void {
 		if (!$this->isActive()) {
@@ -334,7 +337,11 @@ class Session extends Singleton {
 		}
 		
 		$this->deleteAll();
-		$this->application->getCookies()->remove($this->getName());
+		
+		if (array_key_exists('cookies', $this->activeSettings)) {
+			$this->application->getCookies()->remove($this->getName());
+		}
+		
 		session_destroy();
 	}
 	

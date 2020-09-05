@@ -14,6 +14,7 @@ use Exception;
 use kernel\exception\FileErrorHttpException;
 use kernel\exception\InvalidDataHttpException;
 use kernel\exception\ServerErrorHttpException;
+use kernel\KernelRegistry;
 use kernel\pattern\Singleton;
 
 /**
@@ -352,7 +353,7 @@ class Request extends Singleton {
 	}
 	
 	/**
-	 * Сгенерировать CSRF токен
+	 * Генерирует CSRF токен
 	 *
 	 * @param int $length Длина токена
 	 *
@@ -360,16 +361,21 @@ class Request extends Singleton {
 	 *
 	 * @throws Exception
 	 */
-	public function generateCsrfToken(int $length = 32): string {
+	private function generateCsrfToken(int $length = 32): string {
 		return bin2hex(random_bytes($length));
 	}
 	
-	public function createCsrfTokent(string $token) {
-		// TODO: записть в сессию токена
+	public function createCsrfToken() {
+		/** @var Session $session */
+		$session = KernelRegistry::getInstance()->get('session');
+		$session->set('csrf', $this->generateCsrfToken());
 	}
 	
 	/**
-	 * Проверить валидность CSRF токена
+	 * Проверяет валидность CSRF токена.
+	 * Валидация происходит только для non-"safe" методов.
+	 *
+	 * @see https://tools.ietf.org/html/rfc2616#section-9.1.1
 	 *
 	 * @param string|null $clientToken Токен клиента
 	 *
@@ -378,17 +384,17 @@ class Request extends Singleton {
 	 * @throws InvalidDataHttpException
 	 */
 	public function validateCsrfToken(string $clientToken = null): bool {
-		// Валидация происходит только для non-"safe" методов https://tools.ietf.org/html/rfc2616#section-9.1.1
 		if (in_array($this->getRequestMethod(), ['GET', 'HEAD', 'OPTIONS'], true)) {
 			return true;
 		}
 		
-		$trueToken = $this->getCsrfToken();
-		
-		return hash_equals($trueToken, $clientToken);
+		return hash_equals($this->getCsrfToken(), $clientToken);
 	}
 	
 	public function getCsrfToken() {
-		// TODO: получение токена из сессии
+		/** @var Session $session */
+		$session = KernelRegistry::getInstance()->get('session');
+		
+		return $session->get('csrf');
 	}
 }

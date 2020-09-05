@@ -27,14 +27,14 @@ class View {
 	
 	/**
 	 * @param string $view Представление
-	 * @param array|null $data Данные, внутри представления
-	 * @param string|null $layout Шаблон представления
+	 * @param array $data Данные, внутри представления
+	 * @param string $layout Шаблон представления
 	 *
 	 * @throws NotFoundHttpException
 	 */
-	public function render(string $view, array $data = null, string $layout = null) {
+	public function render(string $view, array $data = [], string $layout = '') {
 		$viewFile = APPLICATION . "views/{$view}";
-		$viewLayout = APPLICATION . 'views/' . (isset($layout) ? $layout : $this->defaultLayout);
+		$viewLayout = APPLICATION . 'views/' . (!empty($layout) ? $layout : $this->defaultLayout);
 		
 		if (!is_file($viewFile) || !is_file($viewLayout)) {
 			throw new NotFoundHttpException("Представление {$view} или шаблон {$layout}

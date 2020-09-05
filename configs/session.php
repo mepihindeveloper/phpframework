@@ -28,20 +28,27 @@
  */
 return [
 	'default' => [
+		'lifeTime' => '5',
+		'inactionLifeTime' => '0',
+		'idLifeTime' => '0',
+	],
+	'withCookies' => [
 		'lifeTime' => ini_get('session.gc_maxlifetime'),
-		'inactionLifeTime' => 0,
-		'idLifeTime' => 0,
-		'use_cookies' => '1', //
-		'use_only_cookies' => '1' //
+		'inactionLifeTime' => '0',
+		'idLifeTime' => '0',
+		'cookies' => [
+			'use_cookies' => '1',
+			'use_only_cookies' => '1'
+		],
 	],
 	'short' => [
-		'lifeTime' => 20,
-		'inactionLifeTime' => 15,
-		'idLifeTime' => 5
+		'lifeTime' => '20',
+		'inactionLifeTime' => '15',
+		'idLifeTime' => '5'
 	],
 	'secure' => [
-		'inactionLifeTime' => 300,
-		'idLifeTime' => 900
+		'inactionLifeTime' => '300',
+		'idLifeTime' => '900'
 	],
 	'active' => 'default'
 ];

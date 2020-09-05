@@ -6,11 +6,5 @@
  * Twitter: https://twitter.com/maximepihin
  */
 
-use kernel\helpers\Url;
-
-?>
-	<p><?= $name ?></p>
-<?php
-
-Url::to(['controller' => 'basic', 'action' => 'print'], ['a' => '1', 'b' => '2']);
-?>
+/** @var string $name */
+echo $name;
