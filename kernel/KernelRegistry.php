@@ -17,7 +17,6 @@ use kernel\helpers\Headers;
 use kernel\helpers\Request;
 use kernel\helpers\Session;
 use kernel\pattern\mvc\Router;
-use kernel\pattern\Singleton;
 
 /**
  * Класс, реализуйщий шаблон проектирования "Реестр" (Registry).
@@ -53,10 +52,7 @@ class KernelRegistry extends pattern\registry\Registry {
 			self::$kernelObjects[$name] = $class::getInstance();
 		}
 		
-		foreach (Config::getInstance()->getSection('components') as $name => $class) {
-			self::$objects[$name] = is_subclass_of($class, Singleton::class) ?
-				$class::getInstance() : new $class;
-		}
+		parent::init();
 	}
 	
 	/**
