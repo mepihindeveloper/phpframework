@@ -30,8 +30,8 @@ class NamespaceAutoloader {
 	 */
 	private ?ClassLoader $vendor;
 	
-	public function __construct(ClassLoader $vendor = null) {
-		$this->vendor = $vendor;
+	public function __construct() {
+		$this->vendor = file_exists('vendor') ? require_once 'vendor/autoload.php' : null;
 		$this->add('kernel', ROOT . 'kernel/');
 		$this->register();
 	}
