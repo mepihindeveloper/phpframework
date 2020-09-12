@@ -12,7 +12,6 @@ namespace kernel\helpers;
 
 use kernel\Application;
 use kernel\exception\InvalidDataHttpException;
-use kernel\exception\SessionErrorHttpException;
 
 /**
  * Класс-помощник для работы с мета тегами.
@@ -108,7 +107,6 @@ class MetaTag {
 	 *
 	 * @return $this
 	 * @throws InvalidDataHttpException
-	 * @throws SessionErrorHttpException
 	 */
 	public function addCsrf(): MetaTag {
 		self::$metaTags[] = ['name' => 'csrf', 'content' => Application::getInstance()->getRequest()->getCsrfToken()];
