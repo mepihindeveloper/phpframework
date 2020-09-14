@@ -10,6 +10,7 @@ declare(strict_types = 1);
 
 namespace kernel\pattern\mvc;
 
+use http\Exception\RuntimeException;
 use kernel\exception\NotFoundHttpException;
 
 /**
@@ -41,7 +42,12 @@ class View {
             по пути {$viewFile} или {$viewLayout} не найдены");
 		}
 		
-		extract($data);
+		$countVariables = extract($data, EXTR_SKIP);
+		
+		if ($countVariables !== count($data)) {
+			throw new RuntimeException('Ошибка извлечения: попытка изменения области видимости');
+		}
+		
 		ob_start();
 		require_once $viewFile;
 		$content = ob_get_contents();

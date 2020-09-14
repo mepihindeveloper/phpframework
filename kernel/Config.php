@@ -37,7 +37,7 @@ class Config extends Singleton {
 			throw new ServerErrorHttpException('Отсутствует файл конфигурации');
 		}
 		
-		$this->config = require_once $configFile;
+		$this->config = require $configFile;
 	}
 	
 	/**

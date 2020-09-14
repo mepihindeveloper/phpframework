@@ -40,6 +40,7 @@ class Csrf extends Singleton {
 	private array $settings;
 	
 	public function __construct() {
+		parent::__construct();
 		$this->settings = Application::getInstance()->getConfig()->getProfileSection('security', 'csrf');
 		$this->session = Application::getInstance()->getSession();
 		$this->lifeTime = $this->settings['lifeTime'];

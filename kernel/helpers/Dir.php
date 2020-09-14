@@ -13,6 +13,7 @@ namespace kernel\helpers;
 use kernel\Config;
 use kernel\exception\InvalidDataHttpException;
 use kernel\exception\ServerErrorHttpException;
+use RuntimeException;
 
 /**
  * Класс-помощник для работы с директориями.
@@ -48,11 +49,9 @@ class Dir {
 		$directorySettings = Config::getInstance()->getSection('directories');
 		$directoryActiveSettings = $directorySettings[$directorySettings['active']];
 		
-		mkdir(
-			$params['path'],
-			$params['permission'] ?? $directoryActiveSettings['permission'],
-			$params['recursive'] ?? $directoryActiveSettings['recursive']
-		);
+		if (!mkdir($concurrentDirectory = $params['path'], $params['permission'] ?? $directoryActiveSettings['permission'], $params['recursive'] ?? $directoryActiveSettings['recursive']) && !is_dir($concurrentDirectory)) {
+			throw new RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
+		}
 	}
 	
 	/**

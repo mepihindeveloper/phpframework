@@ -13,6 +13,7 @@ namespace kernel\helpers\database;
 use Exception;
 use kernel\Application;
 use kernel\exception\DatabaseException;
+use kernel\exception\InvalidDataHttpException;
 use kernel\exception\ServerErrorHttpException;
 use PDO;
 use PDOException;
@@ -51,6 +52,7 @@ class Database {
 	 * @param string $section Профиль настроек
 	 *
 	 * @throws DatabaseException
+	 * @throws InvalidDataHttpException
 	 * @throws ServerErrorHttpException
 	 */
 	public function __construct(string $section = 'active') {

@@ -42,6 +42,7 @@ class File {
 	 *
 	 * @param string $path Путь к файлу
 	 *
+	 * @throws InvalidDataHttpException
 	 * @throws ServerErrorHttpException
 	 */
 	public function __construct(string $path) {

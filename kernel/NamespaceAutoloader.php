@@ -31,7 +31,7 @@ class NamespaceAutoloader {
 	private ?ClassLoader $vendor;
 	
 	public function __construct() {
-		$this->vendor = file_exists('vendor') ? require_once 'vendor/autoload.php' : null;
+		$this->vendor = file_exists('vendor') ? require 'vendor/autoload.php' : null;
 		$this->add('kernel', ROOT . 'kernel/');
 		$this->register();
 	}
@@ -66,6 +66,7 @@ class NamespaceAutoloader {
 	 * @param string $dir Путь к директории для поиска вложенных структур
 	 *
 	 * @return array
+	 * @noinspection SlowArrayOperationsInLoopInspection
 	 */
 	private function getSubDirectories(string $dir): array {
 		$directories = array_filter(glob("{$dir}*"), 'is_dir');

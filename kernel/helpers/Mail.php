@@ -74,8 +74,10 @@ class Mail {
 	 * @param Email[] $recipients Массив объектов электронных адресов
 	 * @param array $sender Информация об отправителе ['name', 'email']
 	 *
+	 * @throws EmailValidatorException
+	 * @throws InvalidDataHttpException
+	 * @throws MailValidatorException
 	 * @throws ServerErrorHttpException
-	 * @throws EmailValidatorException|MailValidatorException
 	 */
 	public function __construct(MailValidator $validator, array $recipients, array $sender = []) {
 		$this->validator = $validator;
@@ -89,7 +91,7 @@ class Mail {
 		$this->recipients = $recipients;
 		$this->sender = empty($sender) ? $this->settings['smtpFrom'] : $sender;
 		$this->validator->validateSender($this->sender);
-		$this->boundary = "--" . sha1(uniqid((string)time()));
+		$this->boundary = "--" . sha1(uniqid((string)time(), true));
 	}
 	
 	/**
@@ -127,10 +129,11 @@ class Mail {
 	 * @param array $paths Список путей к файлам
 	 *
 	 * @return $this
+	 * @throws FileErrorHttpException
 	 * @throws ForbiddenHttpException
+	 * @throws InvalidDataHttpException
 	 * @throws NotFoundHttpException
 	 * @throws ServerErrorHttpException
-	 * @throws FileErrorHttpException
 	 */
 	public function addFiles(array $paths): Mail {
 		$this->withFiles = true;

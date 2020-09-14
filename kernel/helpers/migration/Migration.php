@@ -44,6 +44,7 @@ class Migration {
 	/**
 	 * Создает соединение с базой данных и получает конфигурацию миграций
 	 *
+	 * @throws InvalidDataHttpException
 	 * @throws ServerErrorHttpException
 	 */
 	public function __construct() {
@@ -137,6 +138,8 @@ class Migration {
 	 * Выводит на экран список примененных миграций
 	 *
 	 * @param int|null $limit Ограничение длины списка (null - полный список)
+	 *
+	 * @throws DatabaseException
 	 */
 	public function actionHistory(int $limit = null): void {
 		$migrationsList = $this->getMigrationHistory($limit);
@@ -157,6 +160,7 @@ class Migration {
 	 * @param int|null $limit Ограничение длины списка миграций (null - полный список)
 	 *
 	 * @return array Список примененных миграций
+	 * @throws DatabaseException
 	 */
 	private function getMigrationHistory(int $limit = null): array {
 		$limitSql = is_null($limit) ? '' : "LIMIT {$limit}";
@@ -180,6 +184,7 @@ class Migration {
 	 * Возвращает список непримененных миграций
 	 *
 	 * @return array Список непримененных миграций
+	 * @throws DatabaseException
 	 */
 	private function getUnappliedMigrationList(): array {
 		$migrationsAppliedList = $this->getMigrationHistory();
@@ -245,6 +250,8 @@ class Migration {
 	 * Добавляет запись в список примененных миграций
 	 *
 	 * @param string $name Наименованеи миграции
+	 *
+	 * @throws DatabaseException
 	 */
 	private function addMigrationHistory(string $name): void {
 		$sql = "INSERT INTO {$this->settings['table']} (name, apply_time) VALUES(:name, :apply_time)";
@@ -283,6 +290,8 @@ class Migration {
 	 * Удаляет миграцию из списка примененных миграций
 	 *
 	 * @param string $name Наименование миграции
+	 *
+	 * @throws DatabaseException
 	 */
 	public function removeMigrationHistory(string $name): void {
 		$sql = "DELETE FROM {$this->settings['table']} WHERE \"name\" = :name";

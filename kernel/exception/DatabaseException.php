@@ -15,7 +15,7 @@ use Throwable;
 
 class DatabaseException extends Exception {
 	
-	public $statusCode;
+	public int $statusCode;
 	
 	public function __construct($statusCode, $message = "", $code = 0, Throwable $previous = null) {
 		$this->statusCode = $statusCode;

@@ -41,8 +41,9 @@ class Application extends Singleton {
 	 *
 	 * @return void
 	 *
-	 * @throws exception\ServerErrorHttpException
 	 * @throws exception\InvalidDataHttpException
+	 * @throws exception\ServerErrorHttpException
+	 * @throws exception\SessionErrorHttpException
 	 */
 	public function run(NamespaceAutoloader $namespaceAutoloader): void {
 		if (!isset($this->namespaceAutoloader)) {

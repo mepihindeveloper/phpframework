@@ -31,6 +31,7 @@ class Request extends Singleton {
 	private Headers $headers;
 	
 	protected function __construct() {
+		parent::__construct();
 		$this->headers = Application::getInstance()->getHeaders();
 	}
 	

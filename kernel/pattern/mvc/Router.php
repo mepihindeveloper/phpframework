@@ -91,7 +91,8 @@ class Router extends Singleton {
 	 * @throws NotFoundHttpException
 	 * @throws ServerErrorHttpException
 	 */
-	function __construct() {
+	public function __construct() {
+		parent::__construct();
 		$this->config = Config::getInstance();
 		$hasFriendlyUrl = $this->hasFriendlyUrl();
 		$this->urlAttributes = $this->unifyAttributes($hasFriendlyUrl ? $this->getFriendlyUrl() : $_GET);

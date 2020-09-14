@@ -32,6 +32,7 @@ class Cookies extends Singleton {
 	private array $cookie;
 	
 	protected function __construct() {
+		parent::__construct();
 		$this->cookieSettings = Config::getInstance()->getActiveSettings('cookies');
 	}
 	

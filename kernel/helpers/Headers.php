@@ -26,6 +26,7 @@ class Headers extends Singleton {
 	private array $headers;
 	
 	public function __construct() {
+		parent::__construct();
 		$this->headers = $this->getAllHeaders();
 	}
 	
