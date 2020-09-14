@@ -34,7 +34,7 @@ class View {
 	 */
 	public function render(string $view, array $data = [], string $layout = '') {
 		$viewFile = APPLICATION . "views/{$view}";
-		$viewLayout = APPLICATION . 'views/' . (!empty($layout) ? $layout : $this->defaultLayout);
+		$viewLayout = APPLICATION . 'views/layouts/' . (!empty($layout) ? $layout : $this->defaultLayout);
 		
 		if (!is_file($viewFile) || !is_file($viewLayout)) {
 			throw new NotFoundHttpException("Представление {$view} или шаблон {$layout}
@@ -48,5 +48,14 @@ class View {
 		ob_get_clean();
 		
 		require_once $viewLayout;
+	}
+	
+	/**
+	 * Устанавливает шаблон страницы по умолчанию
+	 *
+	 * @param string $layoutPath Шаблон страницы
+	 */
+	public function setDefaultLayout(string $layoutPath): void {
+		$this->defaultLayout = $layoutPath;
 	}
 }
