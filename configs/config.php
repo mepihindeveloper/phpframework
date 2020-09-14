@@ -30,5 +30,6 @@ return [
 			'subjectLength' => 78
 		]
 	],
+	'security' => require_once 'security.php',
 	'components' => require_once 'components.php',
 ];

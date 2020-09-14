@@ -54,6 +54,26 @@ class Session extends Singleton {
 	private Application $application;
 	
 	/**
+	 * Создает ключ активности сессии пользователя
+	 *
+	 * @throws SessionErrorHttpException
+	 */
+	public function beginActivity(): void {
+		if (!$this->hasKey('activity')) {
+			$this->set('activity', ['startTime' => time()]);
+		}
+	}
+	
+	/**
+	 * Удаляет ключ activity пользователя
+	 *
+	 * @throws SessionErrorHttpException
+	 */
+	public function endActivity(): void {
+		$this->delete('activity');
+	}
+	
+	/**
 	 * Запускает сессиию
 	 *
 	 * @param string $name
@@ -63,12 +83,8 @@ class Session extends Singleton {
 	 * @throws InvalidDataHttpException
 	 * @throws ServerErrorHttpException
 	 * @throws SessionErrorHttpException
-	 * @see Session::refresh()
-	 *
-	 * @see Session::isIdExpired()
-	 * @see Session::isValid()
 	 */
-	public function open(string $name = 'appsession'): void {
+	public function start(string $name = 'appsession') {
 		$this->name = $name;
 		$this->application = Application::getInstance();
 		$this->activeSettings = $this->application->getConfig()->getActiveSettings('session');
@@ -79,16 +95,14 @@ class Session extends Singleton {
 			throw new SessionErrorHttpException('Ошибка в работе сессий. Сессия не запущена');
 		}
 		
-		if (!$this->hasKey('startTime')) {
-			$this->set('startTime', time());
-		}
-		
-		if ($this->isIdExpired() || $this->isExpired()) {
-			$this->refresh();
-		}
-		
-		if (!$this->isValid()) {
-			$this->close();
+		if ($this->hasKey('activity')) {
+			if ($this->isIdExpired() || $this->isExpired()) {
+				$this->refresh();
+			}
+			
+			if (!$this->isValid()) {
+				$this->endActivity();
+			}
 		}
 	}
 	
@@ -150,16 +164,18 @@ class Session extends Singleton {
 	 *
 	 * @param string $key Ключ (переменная) сессии
 	 *
+	 * @param string $section Секция, в которой необходимо произвести поиск
+	 *
 	 * @return bool
 	 *
 	 * @throws SessionErrorHttpException
 	 */
-	public function hasKey(string $key): bool {
+	public function hasKey(string $key, string $section = ''): bool {
 		if (!$this->isActive()) {
 			throw new SessionErrorHttpException('Ошибка в работе сессий. Сессия не запущена.');
 		}
 		
-		return array_key_exists($key, $_SESSION);
+		return empty($section) ? array_key_exists($key, $_SESSION) : array_key_exists($key, $_SESSION[$section]);
 	}
 	
 	/**
@@ -167,17 +183,22 @@ class Session extends Singleton {
 	 *
 	 * @param string $key Ключ (переменная) сессии
 	 * @param mixed $value Устанавливаемое значение
+	 * @param string $section Секция, в которую необходимо записать данные
 	 *
 	 * @return void
 	 *
 	 * @throws SessionErrorHttpException
 	 */
-	public function set(string $key, $value): void {
+	public function set(string $key, $value, string $section = ''): void {
 		if (!$this->isActive()) {
 			throw new SessionErrorHttpException('Ошибка в работе сессий. Сессия не запущена.');
 		}
 		
-		$_SESSION[$key] = $value;
+		if (empty($section)) {
+			$_SESSION[$key] = $value;
+		} else {
+			$_SESSION[$section][$key] = $value;
+		}
 	}
 	
 	/**
@@ -191,7 +212,7 @@ class Session extends Singleton {
 		if ($this->idLifeTime === '0')
 			return false;
 		
-		$refreshLastTime = $this->hasKey('refreshLastTime') ? $this->get('refreshLastTime') : false;
+		$refreshLastTime = $this->hasKey('refreshLastTime', 'activity') ? $this->get('refreshLastTime', 'activity') : false;
 		
 		return (!$refreshLastTime || (time() - $refreshLastTime) > $this->idLifeTime);
 	}
@@ -200,17 +221,18 @@ class Session extends Singleton {
 	 * Получает значение сессии по ключу
 	 *
 	 * @param string $key Ключ (переменная) сессии
+	 * @param string $section Секция, из которой необходимо взять данные
 	 *
 	 * @return mixed
 	 *
 	 * @throws SessionErrorHttpException
 	 */
-	public function get(string $key) {
+	public function get(string $key, string $section = '') {
 		if (!$this->isActive()) {
 			throw new SessionErrorHttpException('Ошибка в работе сессий. Сессия не запущена.');
 		}
 		
-		return $_SESSION[$key];
+		return empty($section) ? $_SESSION[$key] : $_SESSION[$section][$key];
 	}
 	
 	/**
@@ -226,7 +248,7 @@ class Session extends Singleton {
 	 */
 	public function refresh(bool $needDeleteSession = false): void {
 		session_regenerate_id($needDeleteSession);
-		$this->set('refreshLastTime', time());
+		$this->set('refreshLastTime', time(), 'activity');
 		$this->refreshFingerprint();
 	}
 	
@@ -238,7 +260,7 @@ class Session extends Singleton {
 	 * @throws SessionErrorHttpException
 	 */
 	public function refreshFingerprint(): void {
-		$this->set('fingerprint', $this->generateHash());
+		$this->set('activity', $this->generateHash(), 'activity');
 	}
 	
 	/**
@@ -286,11 +308,11 @@ class Session extends Singleton {
 	public function isFingerprint(): bool {
 		$hash = $this->generateHash();
 		
-		if ($this->hasKey('fingerprint')) {
-			return $hash === $this->get('fingerprint');
+		if ($this->hasKey('fingerprint', 'activity')) {
+			return $hash === $this->get('fingerprint', 'activity');
 		}
 		
-		$this->set('fingerprint', $hash);
+		$this->set('fingerprint', $hash, 'activity');
 		
 		return true;
 	}
@@ -303,8 +325,8 @@ class Session extends Singleton {
 	 * @throws SessionErrorHttpException
 	 */
 	public function isExpired(): bool {
-		$lastActivity = $this->hasKey('lastActivity') ? $this->get('lastActivity') : false;
-		$startTime = $this->hasKey('startTime') ? $this->get('startTime') : false;
+		$lastActivity = $this->hasKey('lastActivity', 'activity') ? $this->get('lastActivity', 'activity') : false;
+		$startTime = $this->hasKey('startTime', 'activity') ? $this->get('startTime', 'activity') : false;
 		$time = time();
 		$isLifeExpired = ($time - $startTime) > (int)$this->lifeTime;
 		$isInactionExpired = $lastActivity && ($time - $lastActivity) > (int)$this->inactionLifeTime;
@@ -317,7 +339,7 @@ class Session extends Singleton {
 			return true;
 		}
 		
-		$this->set('lastActivity', $time);
+		$this->set('lastActivity', $time, 'activity');
 		
 		return false;
 	}

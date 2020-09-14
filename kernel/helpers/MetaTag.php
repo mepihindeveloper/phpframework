@@ -10,6 +10,9 @@ declare(strict_types = 1);
 
 namespace kernel\helpers;
 
+use kernel\Application;
+use kernel\exception\InvalidDataHttpException;
+
 /**
  * Класс-помощник для работы с мета тегами.
  * Класс позволяет реализовать упрощшенную генерацию мета тегов. Базовые методы реализуют мета теги:
@@ -95,6 +98,18 @@ class MetaTag {
 	 */
 	public function addCustom(array $metaTagAttributes): MetaTag {
 		self::$metaTags[] = $metaTagAttributes;
+		
+		return $this;
+	}
+	
+	/**
+	 * Добавляет мета тег CSRF токена
+	 *
+	 * @return $this
+	 * @throws InvalidDataHttpException
+	 */
+	public function addCsrf(): MetaTag {
+		self::$metaTags[] = ['name' => 'csrf', 'content' => Application::getInstance()->getRequest()->getCsrfToken()];
 		
 		return $this;
 	}

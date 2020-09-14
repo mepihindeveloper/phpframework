@@ -51,6 +51,8 @@ class Application extends Singleton {
 		}
 		
 		KernelRegistry::getInstance()->init();
+		$this->getSession()->start();
+		KernelRegistry::getInstance()->get('csrf')->set();
 		KernelRegistry::getInstance()->get('router')->init();
 	}
 	

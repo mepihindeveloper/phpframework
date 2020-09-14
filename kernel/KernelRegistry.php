@@ -13,6 +13,7 @@ namespace kernel;
 use kernel\exception\InvalidDataHttpException;
 use kernel\exception\ServerErrorHttpException;
 use kernel\helpers\Cookies;
+use kernel\helpers\Csrf;
 use kernel\helpers\Headers;
 use kernel\helpers\Request;
 use kernel\helpers\Session;
@@ -40,6 +41,7 @@ class KernelRegistry extends pattern\registry\Registry {
 		'session' => Session::class,
 		'request' => Request::class,
 		'router' => Router::class,
+		'csrf' => Csrf::class,
 	];
 	
 	/**
