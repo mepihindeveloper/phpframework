@@ -13,7 +13,9 @@ namespace kernel\helpers;
 use Exception;
 use kernel\Application;
 use kernel\exception\CsrfSecurityException;
+use kernel\exception\InvalidDataHttpException;
 use kernel\exception\SessionErrorHttpException;
+use kernel\KernelRegistry;
 use kernel\pattern\Singleton;
 
 /**
@@ -46,7 +48,6 @@ class Csrf extends Singleton {
 	/**
 	 * Назначает токен
 	 *
-	 * @throws CsrfSecurityException
 	 * @throws SessionErrorHttpException
 	 */
 	public function set(): void {
@@ -110,5 +111,28 @@ class Csrf extends Singleton {
 		$this->checkEnabled();
 		
 		return $this->session->get('csrf');
+	}
+	
+	/**
+	 * Проверяет валидность CSRF токена.
+	 * В случае использования useCookies в настройках csrf токен берется из $_COOKIES и не требует передачи атрибута в
+	 * метод.
+	 *
+	 * @param string $clientToken Токен клиента
+	 *
+	 * @return bool
+	 * @throws CsrfSecurityException
+	 * @throws SessionErrorHttpException
+	 * @throws InvalidDataHttpException
+	 */
+	public function validate(string $clientToken = ''): bool {
+		if ($this->settings['useCookies']) {
+			/** @var Cookies $cookies */
+			$cookies = KernelRegistry::getInstance()->get('cookies');
+			
+			return $cookies->has('csrf') ? hash_equals($this->get(), $cookies->get('csrf')) : false;
+		}
+		
+		return hash_equals($this->get(), $clientToken);
 	}
 }

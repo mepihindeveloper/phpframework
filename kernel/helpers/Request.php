@@ -353,20 +353,23 @@ class Request extends Singleton {
 	}
 	
 	/**
-	 * Проверяет валидность CSRF токена.
-	 * Валидация происходит только для non-"safe" методов.
+	 * Проверяет валидность CSRF токена. Валидация происходит только для non-"safe" методов.
+	 * В случае использования useCookies в настройках csrf токен берется из $_COOKIES и не требует передачи атрибута в
+	 * метод.
 	 *
 	 * @see https://tools.ietf.org/html/rfc2616#section-9.1.1
-	 * @param string|null $clientToken Токен клиента
+	 *
+	 * @param string $clientToken Токен клиента
+	 *
 	 * @return bool
 	 * @throws InvalidDataHttpException
 	 */
-	public function validateCsrfToken(string $clientToken = null): bool {
+	public function validateCsrfToken(string $clientToken = ''): bool {
 		if (in_array($this->getRequestMethod(), ['GET', 'HEAD', 'OPTIONS'], true)) {
 			return true;
 		}
 		
-		return hash_equals($this->getCsrfToken(), $clientToken);
+		return KernelRegistry::getInstance()->get('csrf')->validate($clientToken);
 	}
 	
 	/**
