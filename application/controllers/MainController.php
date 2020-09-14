@@ -8,7 +8,7 @@
 
 declare(strict_types = 1);
 
-namespace controllers;
+namespace application\controllers;
 
 use kernel\pattern\mvc\Controller;
 

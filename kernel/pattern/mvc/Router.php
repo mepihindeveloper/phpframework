@@ -181,7 +181,7 @@ class Router extends Singleton {
 	 * @return void
 	 */
 	private function setModule(): void {
-		$this->moduleName = $this->hasUrlModule() ? $this->urlAttributes['module'] . '/' : $this->defaultModule;
+		$this->moduleName = $this->hasUrlModule() ? $this->urlAttributes['module'] : $this->defaultModule;
 	}
 	
 	/**
@@ -267,7 +267,9 @@ class Router extends Singleton {
 		
 		require_once $controllerFile;
 		
-		$controllerClass = 'controllers\\' . $this->controllerName;
+		$controllerClass = 'application\\controllers\\' . (is_null($this->moduleName)
+				? $this->controllerName
+				: "{$this->moduleName}\\{$this->controllerName}");
 		$this->controllerObject = new $controllerClass;
 		
 		if (!method_exists($this->controllerObject, $this->actionName)) {
@@ -284,7 +286,7 @@ class Router extends Singleton {
 	 * @return string
 	 */
 	private function getControllerFile(): string {
-		return (APPLICATION . 'controllers/' . $this->moduleName . $this->controllerName . '.php');
+		return APPLICATION . 'controllers/' . $this->moduleName . '/' . $this->controllerName . '.php';
 	}
 	
 	/**
