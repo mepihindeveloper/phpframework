@@ -1,3 +1,4 @@
+<?php /** @var string $content Результат рендера представления */ ?>
 <!doctype html>
 
 <html lang="ru">

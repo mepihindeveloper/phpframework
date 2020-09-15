@@ -10,7 +10,8 @@ declare(strict_types = 1);
 
 namespace kernel\pattern\mvc;
 
-use kernel\exception\NotFoundHttpException;
+use http\Exception\RuntimeException;
+use kernel\exception\http\NotFoundHttpException;
 
 /**
  * Класс, реализуйщий представление шаблона проектирования MVC.
@@ -32,7 +33,7 @@ class View {
 	 *
 	 * @throws NotFoundHttpException
 	 */
-	public function render(string $view, array $data = [], string $layout = '') {
+	public function render(string $view, array $data = [], string $layout = ''): void {
 		$viewFile = APPLICATION . "views/{$view}";
 		$viewLayout = APPLICATION . 'views/layouts/' . (!empty($layout) ? $layout : $this->defaultLayout);
 		
@@ -41,7 +42,12 @@ class View {
             по пути {$viewFile} или {$viewLayout} не найдены");
 		}
 		
-		extract($data);
+		$countVariables = extract($data, EXTR_SKIP);
+		
+		if ($countVariables !== count($data)) {
+			throw new RuntimeException('Ошибка извлечения: попытка изменения области видимости');
+		}
+		
 		ob_start();
 		require_once $viewFile;
 		$content = ob_get_contents();

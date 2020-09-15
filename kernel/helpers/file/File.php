@@ -10,11 +10,12 @@ declare(strict_types = 1);
 
 namespace kernel\helpers\file;
 
+use Exception;
 use kernel\Application;
-use kernel\exception\FileErrorHttpException;
-use kernel\exception\ForbiddenHttpException;
-use kernel\exception\InvalidDataHttpException;
-use kernel\exception\ServerErrorHttpException;
+use kernel\exception\http\FileErrorHttpException;
+use kernel\exception\http\ForbiddenHttpException;
+use kernel\exception\http\InvalidDataHttpException;
+use kernel\exception\http\ServerErrorHttpException;
 
 /**
  * Касс-помощник для работы с файлами.
@@ -42,6 +43,7 @@ class File {
 	 *
 	 * @param string $path Путь к файлу
 	 *
+	 * @throws InvalidDataHttpException
 	 * @throws ServerErrorHttpException
 	 */
 	public function __construct(string $path) {
@@ -59,9 +61,10 @@ class File {
 	 *     микросекундами
 	 *
 	 * @return string
+	 * @throws Exception
 	 */
 	public static function generateFilename(): string {
-		return sha1(microtime() . rand(0, 9999));
+		return sha1(microtime() . random_int(0, 9999));
 	}
 	
 	/**
@@ -89,7 +92,7 @@ class File {
 	 * @return bool
 	 */
 	public function isAllowedExtension(string $extension): bool {
-		return in_array(strtolower($extension), array_keys($this->settings['formats']));
+		return array_key_exists(strtolower($extension), array_keys($this->settings['formats']));
 	}
 	
 	/**
@@ -186,7 +189,7 @@ class File {
 			throw new FileErrorHttpException("Не возможно получить содержимое файла, так как он не существует: {$this->path}");
 		}
 		
-		$maxlength = $maxlength === 0 ? filesize($this->path) : $maxlength;
+		$maxlength = (int)($maxlength === 0 ? filesize($this->path) : $maxlength);
 		
 		return file_get_contents($this->path, $useIncludePath, $context, $offset, $maxlength);
 	}
@@ -256,11 +259,11 @@ class File {
 	 * @return int
 	 */
 	private function convertSizeToBytes(string $iniMaxsize): int {
-		$pow = stripos($iniMaxsize, 'K') ? 1 : (stripos($iniMaxsize, 'M') ? 2 :
-			(stripos($iniMaxsize, 'G') ? 3 : 0));
-		$size = (int)str_replace(['K', 'M', 'G'], '', $iniMaxsize);
+		$maxsizePow = ['K' => 1, 'M' => 2, 'G' => 3];
+		$pow = array_key_exists($iniMaxsize, $maxsizePow) ? $maxsizePow[$iniMaxsize] : 0;
+		$size = (int)str_replace(array_keys($maxsizePow), '', $iniMaxsize);
 		
-		return $pow > 0 ? $size * pow(1024, $pow) : $size;
+		return $pow > 0 ? $size * (1024 ** $pow) : $size;
 	}
 	
 	/**

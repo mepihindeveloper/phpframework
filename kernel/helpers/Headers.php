@@ -10,7 +10,7 @@ declare(strict_types = 1);
 
 namespace kernel\helpers;
 
-use kernel\exception\InvalidDataHttpException;
+use kernel\exception\http\InvalidDataHttpException;
 use kernel\pattern\Singleton;
 
 /**
@@ -26,6 +26,7 @@ class Headers extends Singleton {
 	private array $headers;
 	
 	public function __construct() {
+		parent::__construct();
 		$this->headers = $this->getAllHeaders();
 	}
 	
@@ -43,7 +44,7 @@ class Headers extends Singleton {
 			$headers = [];
 			
 			foreach ($_SERVER as $name => $value) {
-				if (substr($name, 0, 5) == 'HTTP_') {
+				if (strpos($name, 'HTTP_') === 0) {
 					$headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
 				}
 			}
@@ -51,7 +52,7 @@ class Headers extends Singleton {
 			return $headers;
 		}
 		
-		return getallheaders() ? getallheaders() : [];
+		return getallheaders() !== false ? getallheaders() : [];
 	}
 	
 	/**
@@ -63,7 +64,7 @@ class Headers extends Singleton {
 	 */
 	public function add(array $params): void {
 		foreach ($params as $header => $value) {
-			$headerExists = in_array($header, array_keys($this->headers));
+			$headerExists = array_key_exists($header, array_keys($this->headers));
 			$this->headers[$header] = $value;
 			
 			header("{$header}: {$value}", $headerExists);

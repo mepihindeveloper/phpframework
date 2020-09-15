@@ -11,7 +11,7 @@ declare(strict_types = 1);
 namespace kernel\helpers;
 
 use kernel\Application;
-use kernel\exception\InvalidDataHttpException;
+use kernel\exception\http\InvalidDataHttpException;
 
 /**
  * Класс-помощник для работы с мета тегами.
@@ -40,7 +40,7 @@ class MetaTag {
 		foreach (self::$metaTags as $metaTag) {
 			$metaCode .= "<meta ";
 			
-			array_walk($metaTag, function($value, $key) use (&$metaCode) {
+			array_walk($metaTag, static function($value, $key) use (&$metaCode) {
 				$metaCode .= "{$key}='{$value}'";
 			});
 			

@@ -11,6 +11,7 @@ declare(strict_types = 1);
 namespace kernel\pattern;
 
 use Exception;
+use RuntimeException;
 
 /**
  * Класс, реализуйщий шаблон проектирования "Одиночка" (Singleton).
@@ -53,7 +54,7 @@ class Singleton {
 	 *
 	 * @return array
 	 */
-	static function getAllInstances(): array {
+	public static function getAllInstances(): array {
 		return self::$instances;
 	}
 	
@@ -63,7 +64,7 @@ class Singleton {
 	 * @throws Exception
 	 */
 	public function __wakeup() {
-		throw new Exception("Невозможно десериализовать синглтон.");
+		throw new RuntimeException("Невозможно десериализовать синглтон.");
 	}
 	
 	/**

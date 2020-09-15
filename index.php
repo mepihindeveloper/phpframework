@@ -15,7 +15,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 
-defined('ISCLI') or define('ISCLI', php_sapi_name() === 'cli');
+defined('ISCLI') or define('ISCLI', PHP_SAPI === 'cli');
 
 $root = ISCLI ? getenv('PWD') : $_SERVER['DOCUMENT_ROOT'];
 

@@ -10,8 +10,8 @@ declare(strict_types = 1);
 
 namespace kernel;
 
-use kernel\exception\InvalidDataHttpException;
-use kernel\exception\ServerErrorHttpException;
+use kernel\exception\http\InvalidDataHttpException;
+use kernel\exception\http\ServerErrorHttpException;
 use kernel\helpers\Cookies;
 use kernel\helpers\Csrf;
 use kernel\helpers\Headers;

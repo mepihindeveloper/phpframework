@@ -11,8 +11,8 @@ declare(strict_types = 1);
 namespace kernel\helpers;
 
 use kernel\Application;
-use kernel\exception\InvalidDataHttpException;
-use kernel\exception\ServerErrorHttpException;
+use kernel\exception\http\InvalidDataHttpException;
+use kernel\exception\http\ServerErrorHttpException;
 
 /**
  * Класс-помощник для работы с ссылками.
@@ -46,7 +46,7 @@ class Url {
 		$normalizedAttributes = [];
 		
 		foreach (['controller', 'action'] as $requiredAttribute) {
-			if (!in_array($requiredAttribute, array_keys($routerAttributes))) {
+			if (!array_key_exists($requiredAttribute, array_keys($routerAttributes))) {
 				$normalizedAttributes[$requiredAttribute] = $application->getRouter()->getDefaultProperty($requiredAttribute);
 			} else {
 				$normalizedAttributes[$requiredAttribute] = ($routerAttributes[$requiredAttribute]);

@@ -13,7 +13,8 @@ namespace kernel\helpers\database;
 use Exception;
 use kernel\Application;
 use kernel\exception\DatabaseException;
-use kernel\exception\ServerErrorHttpException;
+use kernel\exception\http\InvalidDataHttpException;
+use kernel\exception\http\ServerErrorHttpException;
 use PDO;
 use PDOException;
 use PDOStatement;
@@ -51,6 +52,7 @@ class Database {
 	 * @param string $section Профиль настроек
 	 *
 	 * @throws DatabaseException
+	 * @throws InvalidDataHttpException
 	 * @throws ServerErrorHttpException
 	 */
 	public function __construct(string $section = 'active') {
@@ -58,8 +60,9 @@ class Database {
 			Application::getInstance()->getConfig()->getActiveSettings('database') :
 			Application::getInstance()->getConfig()->getProfileSection('database', $section);
 		
-		if (empty($this->config))
+		if (empty($this->config)) {
 			throw new DatabaseException(500, 'Отсутствует конфигурация подключений к базе данных');
+		}
 		
 		$this->connect();
 	}
@@ -97,14 +100,14 @@ class Database {
 	/**
 	 * Закрывает подключение к базе данных
 	 */
-	public function closeConnection() {
+	public function closeConnection(): void {
 		$this->pdo = null;
 	}
 	
 	/**
 	 * Начинает транзакцию
 	 */
-	public function beginTransaction() {
+	public function beginTransaction(): void {
 		if (!$this->isTransaction) {
 			$this->pdo->beginTransaction();
 			$this->isTransaction = true;
@@ -116,7 +119,7 @@ class Database {
 	 *
 	 * @throws DatabaseException
 	 */
-	public function commit() {
+	public function commit(): void {
 		try {
 			if (!empty($this->executeList)) {
 				foreach ($this->executeList as $executeQuery) {
@@ -204,7 +207,7 @@ class Database {
 	 *
 	 * @return array
 	 */
-	private function bindAttributes(array $attributes) {
+	private function bindAttributes(array $attributes): array {
 		$bindedAttributes = [];
 		
 		foreach ($attributes as $key => $value) {

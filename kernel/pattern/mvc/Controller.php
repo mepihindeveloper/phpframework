@@ -23,7 +23,7 @@ class Controller {
 	 */
 	private View $view;
 	
-	function __construct() {
+	public function __construct() {
 		$this->view = new View();
 	}
 	

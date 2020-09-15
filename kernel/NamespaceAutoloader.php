@@ -31,7 +31,7 @@ class NamespaceAutoloader {
 	private ?ClassLoader $vendor;
 	
 	public function __construct() {
-		$this->vendor = file_exists('vendor') ? require_once 'vendor/autoload.php' : null;
+		$this->vendor = file_exists('vendor') ? require 'vendor/autoload.php' : null;
 		$this->add('kernel', ROOT . 'kernel/');
 		$this->register();
 	}
@@ -45,15 +45,17 @@ class NamespaceAutoloader {
 	 * @return void
 	 */
 	public function add(string $namespace, string $root): void {
-		$rootNormalized = substr($root, -1) == '/' ? $root : $root . '/';
-		if (!is_dir($rootNormalized))
+		$rootNormalized = substr($root, -1) === '/' ? $root : $root . '/';
+		if (!is_dir($rootNormalized)) {
 			return;
+		}
 		
 		$this->map[$namespace][] = $rootNormalized;
 		$subDirectories = $this->getSubDirectories("{$rootNormalized}*");
 		
-		if (!is_array($subDirectories))
+		if (!is_array($subDirectories)) {
 			return;
+		}
 		
 		foreach ($subDirectories as $subDirectory) {
 			$this->map[$namespace][] = $subDirectory;
@@ -66,6 +68,7 @@ class NamespaceAutoloader {
 	 * @param string $dir Путь к директории для поиска вложенных структур
 	 *
 	 * @return array
+	 * @noinspection SlowArrayOperationsInLoopInspection
 	 */
 	private function getSubDirectories(string $dir): array {
 		$directories = array_filter(glob("{$dir}*"), 'is_dir');
@@ -110,14 +113,16 @@ class NamespaceAutoloader {
 	private function autoload(string $class): void {
 		$pathParts = explode('\\', $class);
 		
-		if (!is_array($pathParts))
+		if (!is_array($pathParts)) {
 			return;
+		}
 		
 		$namespace = array_shift($pathParts);
 		$namespaceDirectories = $this->map[$namespace];
 		
-		if (empty($namespaceDirectories))
+		if (empty($namespaceDirectories)) {
 			return;
+		}
 		
 		foreach ($namespaceDirectories as $namespaceDirectory) {
 			$filePath = "{$namespaceDirectory}/" . end($pathParts) . '.php';

@@ -11,9 +11,9 @@ declare(strict_types = 1);
 namespace kernel\pattern\mvc;
 
 use kernel\Config;
-use kernel\exception\InvalidDataHttpException;
-use kernel\exception\NotFoundHttpException;
-use kernel\exception\ServerErrorHttpException;
+use kernel\exception\http\InvalidDataHttpException;
+use kernel\exception\http\NotFoundHttpException;
+use kernel\exception\http\ServerErrorHttpException;
 use kernel\pattern\Singleton;
 
 /**
@@ -91,7 +91,8 @@ class Router extends Singleton {
 	 * @throws NotFoundHttpException
 	 * @throws ServerErrorHttpException
 	 */
-	function __construct() {
+	public function __construct() {
+		parent::__construct();
 		$this->config = Config::getInstance();
 		$hasFriendlyUrl = $this->hasFriendlyUrl();
 		$this->urlAttributes = $this->unifyAttributes($hasFriendlyUrl ? $this->getFriendlyUrl() : $_GET);
@@ -149,7 +150,7 @@ class Router extends Singleton {
 					}
 				}
 				
-				$matches = array_filter($matches, function($value, $key) {
+				$matches = array_filter($matches, static function($value, $key) {
 					return !is_numeric($key) && !empty($value);
 				}, ARRAY_FILTER_USE_BOTH);
 				
@@ -242,7 +243,7 @@ class Router extends Singleton {
 	 *
 	 * @return bool
 	 */
-	public function hasUrlAction() {
+	public function hasUrlAction(): bool {
 		return array_key_exists('action', $this->urlAttributes);
 	}
 	
@@ -258,7 +259,7 @@ class Router extends Singleton {
 	/**
 	 * @throws NotFoundHttpException
 	 */
-	public function init() {
+	public function init(): void {
 		$controllerFile = $this->getControllerFile();
 		
 		if (!file_exists($controllerFile) || !is_readable($controllerFile)) {
@@ -296,13 +297,14 @@ class Router extends Singleton {
 	 *
 	 * @return array
 	 */
-	public function getMethodParams(array $attributes = []) {
+	public function getMethodParams(array $attributes = []): array {
 		$params = [];
 		$urlAttributes = !empty($attributes) ? $attributes : $this->urlAttributes;
 		
 		foreach ($urlAttributes as $param => $value) {
-			if (in_array($param, ['module', 'controller', 'action']))
+			if (in_array($param, ['module', 'controller', 'action'])) {
 				continue;
+			}
 			
 			$params[$param] = htmlspecialchars(stripslashes(trim($value)));
 		}

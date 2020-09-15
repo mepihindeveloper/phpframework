@@ -11,7 +11,7 @@ declare(strict_types = 1);
 namespace kernel\helpers;
 
 use kernel\Config;
-use kernel\exception\InvalidDataHttpException;
+use kernel\exception\http\InvalidDataHttpException;
 use kernel\pattern\Singleton;
 
 /**
@@ -32,6 +32,7 @@ class Cookies extends Singleton {
 	private array $cookie;
 	
 	protected function __construct() {
+		parent::__construct();
 		$this->cookieSettings = Config::getInstance()->getActiveSettings('cookies');
 	}
 	

@@ -11,9 +11,9 @@ declare(strict_types = 1);
 namespace kernel\helpers;
 
 use kernel\Application;
-use kernel\exception\FileErrorHttpException;
-use kernel\exception\InvalidDataHttpException;
-use kernel\exception\ServerErrorHttpException;
+use kernel\exception\http\FileErrorHttpException;
+use kernel\exception\http\InvalidDataHttpException;
+use kernel\exception\http\ServerErrorHttpException;
 use kernel\KernelRegistry;
 use kernel\pattern\Singleton;
 
@@ -31,6 +31,7 @@ class Request extends Singleton {
 	private Headers $headers;
 	
 	protected function __construct() {
+		parent::__construct();
 		$this->headers = Application::getInstance()->getHeaders();
 	}
 	
@@ -38,7 +39,6 @@ class Request extends Singleton {
 	 * Проверяет является ли запрос GET
 	 *
 	 * @return bool
-	 *
 	 * @throws InvalidDataHttpException
 	 */
 	public function isGet(): bool {
@@ -49,7 +49,6 @@ class Request extends Singleton {
 	 * Получает метод запроса (GET, POST, HEAD, PUT, PATCH, DELETE)
 	 *
 	 * @return string
-	 *
 	 * @throws InvalidDataHttpException
 	 */
 	public function getRequestMethod(): string {
@@ -64,7 +63,6 @@ class Request extends Singleton {
 	 * Проверяет является ли запрос POST
 	 *
 	 * @return bool
-	 *
 	 * @throws InvalidDataHttpException
 	 */
 	public function isPost(): bool {
@@ -75,7 +73,6 @@ class Request extends Singleton {
 	 * Проверяет является ли запрос Ajax
 	 *
 	 * @return bool
-	 *
 	 * @throws InvalidDataHttpException
 	 */
 	public function isAjax(): bool {
@@ -86,7 +83,6 @@ class Request extends Singleton {
 	 * Проверяет является ли запрос PUT
 	 *
 	 * @return bool
-	 *
 	 * @throws InvalidDataHttpException
 	 */
 	public function isPut(): bool {
@@ -97,7 +93,6 @@ class Request extends Singleton {
 	 * Проверяет является ли запрос DELETE
 	 *
 	 * @return bool
-	 *
 	 * @throws InvalidDataHttpException
 	 */
 	public function isDelete(): bool {
@@ -108,7 +103,6 @@ class Request extends Singleton {
 	 * Проверяет является ли запрос PATCH
 	 *
 	 * @return bool
-	 *
 	 * @throws InvalidDataHttpException
 	 */
 	public function isPatch(): bool {
@@ -119,7 +113,6 @@ class Request extends Singleton {
 	 * Проверяет является ли запрос OPTIONS
 	 *
 	 * @return bool
-	 *
 	 * @throws InvalidDataHttpException
 	 */
 	public function isOptions(): bool {
@@ -130,7 +123,6 @@ class Request extends Singleton {
 	 * Проверяет является ли запрос HEAD
 	 *
 	 * @return bool
-	 *
 	 * @throws InvalidDataHttpException
 	 */
 	public function isHead(): bool {
@@ -165,7 +157,7 @@ class Request extends Singleton {
 	 * @return string|null
 	 */
 	public function getRemoteHost(): ?string {
-		return isset($_SERVER['REMOTE_HOST']) ? $_SERVER['REMOTE_HOST'] : null;
+		return $_SERVER['REMOTE_HOST'] ?? null;
 	}
 	
 	/**
@@ -174,14 +166,13 @@ class Request extends Singleton {
 	 * @return string|null
 	 */
 	public function getRemoteIP(): ?string {
-		return isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
+		return $_SERVER['REMOTE_ADDR'] ?? null;
 	}
 	
 	/**
 	 * Получает user agent
 	 *
 	 * @return string
-	 *
 	 * @throws InvalidDataHttpException
 	 */
 	public function getUserAgent(): string {
@@ -192,7 +183,6 @@ class Request extends Singleton {
 	 * Получает URL-реферер
 	 *
 	 * @return string
-	 *
 	 * @throws InvalidDataHttpException
 	 */
 	public function getReferrer(): string {
@@ -212,18 +202,16 @@ class Request extends Singleton {
 	 * Получает тип контента запроса
 	 *
 	 * @return string
-	 *
 	 * @throws InvalidDataHttpException
 	 */
 	public function getContentType(): string {
-		return isset($_SERVER['CONTENT_TYPE']) ? $_SERVER['CONTENT_TYPE'] : $this->headers->get('Content-Type');
+		return $_SERVER['CONTENT_TYPE'] ?? $this->headers->get('Content-Type');
 	}
 	
 	/**
 	 * Получает часть хоста текущего запроса URL
 	 *
 	 * @return mixed
-	 *
 	 * @throws InvalidDataHttpException
 	 */
 	public function getHostName() {
@@ -234,7 +222,6 @@ class Request extends Singleton {
 	 * Получает схему и часть хоста текущего запроса URL. Возвращенный URL не имеет конечной косой черты.
 	 *
 	 * @return string|null
-	 *
 	 * @throws InvalidDataHttpException
 	 */
 	public function getHostInfo(): ?string {
@@ -264,7 +251,7 @@ class Request extends Singleton {
 	 * @return bool
 	 */
 	public function isSecureConnection(): bool {
-		return (isset($_SERVER['HTTPS']) && (strcasecmp($_SERVER['HTTPS'], 'on') === 0 || $_SERVER['HTTPS'] == 1));
+		return (isset($_SERVER['HTTPS']) && (strcasecmp($_SERVER['HTTPS'], 'on') === 0 || $_SERVER['HTTPS'] === 1));
 	}
 	
 	/**
@@ -284,7 +271,7 @@ class Request extends Singleton {
 	 * @return int|null
 	 */
 	public function getServerPort(): ?int {
-		return isset($_SERVER['SERVER_PORT']) ? (int)$_SERVER['SERVER_PORT'] : null;
+		return $_SERVER['SERVER_PORT'] ?? null;
 	}
 	
 	/**
@@ -310,15 +297,18 @@ class Request extends Singleton {
 	public function getScriptUrl(): string {
 		$scriptFile = $this->getScriptFile();
 		$scriptName = basename($scriptFile);
+		$scriptUrl = '';
 		
 		if (isset($_SERVER['SCRIPT_NAME']) && basename($_SERVER['SCRIPT_NAME']) === $scriptName) {
 			$scriptUrl = $_SERVER['SCRIPT_NAME'];
-		} else if (isset($_SERVER['PHP_SELF']) && basename($_SERVER['PHP_SELF']) === $scriptName) {
-			$scriptUrl = $_SERVER['PHP_SELF'];
+		} else if (isset($_SERVER['PHP_SELF'])) {
+			if (basename($_SERVER['PHP_SELF']) === $scriptName) {
+				$scriptUrl = $_SERVER['PHP_SELF'];
+			} else if (($pos = strpos($_SERVER['PHP_SELF'], '/' . $scriptName)) !== false) {
+				$scriptUrl = substr($_SERVER['SCRIPT_NAME'], 0, $pos) . '/' . $scriptName;
+			}
 		} else if (isset($_SERVER['ORIG_SCRIPT_NAME']) && basename($_SERVER['ORIG_SCRIPT_NAME']) === $scriptName) {
 			$scriptUrl = $_SERVER['ORIG_SCRIPT_NAME'];
-		} else if (isset($_SERVER['PHP_SELF']) && ($pos = strpos($_SERVER['PHP_SELF'], '/' . $scriptName)) !== false) {
-			$scriptUrl = substr($_SERVER['SCRIPT_NAME'], 0, $pos) . '/' . $scriptName;
 		} else if (!empty($_SERVER['DOCUMENT_ROOT']) && strpos($scriptFile, $_SERVER['DOCUMENT_ROOT']) === 0) {
 			$scriptUrl = str_replace([$_SERVER['DOCUMENT_ROOT'], '\\'], ['', '/'], $scriptFile);
 		} else {
@@ -349,7 +339,7 @@ class Request extends Singleton {
 	 * @return string
 	 */
 	public function getQueryString(): string {
-		return isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : '';
+		return $_SERVER['QUERY_STRING'] ?? '';
 	}
 	
 	/**

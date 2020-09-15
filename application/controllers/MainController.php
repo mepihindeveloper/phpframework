@@ -12,9 +12,15 @@ namespace application\controllers;
 
 use kernel\pattern\mvc\Controller;
 
+/**
+ * Класс MainController.
+ * Базовый класс домашней страницы.
+ *
+ * @package application\controllers
+ */
 class MainController extends Controller {
 	
-	public function actionIndex() {
+	public function actionIndex(): void {
 		$name = 'Привет мир!';
 		$this->getView()->render('index.php', compact('name'));
 	}

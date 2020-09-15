@@ -10,7 +10,7 @@ declare(strict_types = 1);
 
 namespace kernel\helpers;
 
-use kernel\exception\EmailValidatorException;
+use kernel\exception\validator\EmailValidatorException;
 use kernel\validators\EmailValidator;
 
 /**
