@@ -10,7 +10,7 @@ declare(strict_types = 1);
 
 namespace kernel;
 
-use kernel\exception\ServerErrorHttpException;
+use kernel\exception\http\ServerErrorHttpException;
 use kernel\pattern\Singleton;
 
 /**
@@ -24,7 +24,7 @@ class Config extends Singleton {
 	/**
 	 * @var array Массив конфигрурации приложения
 	 */
-	private array $config = [];
+	private array $config;
 	
 	/**
 	 * @throws ServerErrorHttpException

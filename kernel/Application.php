@@ -10,6 +10,9 @@ declare(strict_types = 1);
 
 namespace kernel;
 
+use kernel\exception\http\InvalidDataHttpException;
+use kernel\exception\http\ServerErrorHttpException;
+use kernel\exception\http\SessionErrorHttpException;
 use kernel\helpers\Cookies;
 use kernel\helpers\Headers;
 use kernel\helpers\Request;
@@ -41,9 +44,9 @@ class Application extends Singleton {
 	 *
 	 * @return void
 	 *
-	 * @throws exception\InvalidDataHttpException
-	 * @throws exception\ServerErrorHttpException
-	 * @throws exception\SessionErrorHttpException
+	 * @throws InvalidDataHttpException
+	 * @throws ServerErrorHttpException
+	 * @throws SessionErrorHttpException
 	 */
 	public function run(NamespaceAutoloader $namespaceAutoloader): void {
 		if (!isset($this->namespaceAutoloader)) {
@@ -76,7 +79,7 @@ class Application extends Singleton {
 	 * Возвращает Объект класса управления конфигурацией
 	 *
 	 * @return Config
-	 * @throws exception\InvalidDataHttpException
+	 * @throws InvalidDataHttpException
 	 */
 	public function getConfig(): Config {
 		return KernelRegistry::getInstance()->get('config');
@@ -86,7 +89,7 @@ class Application extends Singleton {
 	 * Возврщает объект класса управления маршрутизацией
 	 *
 	 * @return Router
-	 * @throws exception\InvalidDataHttpException
+	 * @throws InvalidDataHttpException
 	 */
 	public function getRouter(): Router {
 		return KernelRegistry::getInstance()->get('router');
@@ -96,7 +99,7 @@ class Application extends Singleton {
 	 * Возвращает объект класса управления Cookies
 	 *
 	 * @return Cookies
-	 * @throws exception\InvalidDataHttpException
+	 * @throws InvalidDataHttpException
 	 */
 	public function getCookies(): Cookies {
 		return KernelRegistry::getInstance()->get('cookies');
@@ -106,7 +109,7 @@ class Application extends Singleton {
 	 * Возвращает объект класса управления заголовками
 	 *
 	 * @return Headers
-	 * @throws exception\InvalidDataHttpException
+	 * @throws InvalidDataHttpException
 	 */
 	public function getHeaders(): Headers {
 		return KernelRegistry::getInstance()->get('headers');
@@ -116,7 +119,7 @@ class Application extends Singleton {
 	 * Возвращает объект класса управления запросами
 	 *
 	 * @return Request
-	 * @throws exception\InvalidDataHttpException
+	 * @throws InvalidDataHttpException
 	 */
 	public function getRequest(): Request {
 		return KernelRegistry::getInstance()->get('request');
@@ -126,7 +129,7 @@ class Application extends Singleton {
 	 * Возращает объект класса управления сессией
 	 *
 	 * @return Session
-	 * @throws exception\InvalidDataHttpException
+	 * @throws InvalidDataHttpException
 	 */
 	public function getSession(): Session {
 		return KernelRegistry::getInstance()->get('session');

@@ -11,7 +11,7 @@ declare(strict_types = 1);
 namespace kernel\pattern\mvc;
 
 use http\Exception\RuntimeException;
-use kernel\exception\NotFoundHttpException;
+use kernel\exception\http\NotFoundHttpException;
 
 /**
  * Класс, реализуйщий представление шаблона проектирования MVC.
@@ -33,7 +33,7 @@ class View {
 	 *
 	 * @throws NotFoundHttpException
 	 */
-	public function render(string $view, array $data = [], string $layout = '') {
+	public function render(string $view, array $data = [], string $layout = ''): void {
 		$viewFile = APPLICATION . "views/{$view}";
 		$viewLayout = APPLICATION . 'views/layouts/' . (!empty($layout) ? $layout : $this->defaultLayout);
 		

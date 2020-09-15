@@ -10,8 +10,8 @@ declare(strict_types = 1);
 
 namespace kernel\validators;
 
-use kernel\exception\EmailValidatorException;
-use kernel\exception\MailValidatorException;
+use kernel\exception\validator\EmailValidatorException;
+use kernel\exception\validator\MailValidatorException;
 use kernel\helpers\Email;
 
 /**
@@ -31,9 +31,9 @@ class MailValidator extends Validator {
 	 */
 	public function validateSubject(string $subject): void {
 		$subjectLength = $this->settings['mail']['subjectLength'] ?? null;
-		$isSubjectLengthCorrect = mb_strlen($subject) > $subjectLength ? false : true;
+		$isSubjectLengthCorrect = !(mb_strlen($subject) > $subjectLength);
 		
-		if (!is_null($subjectLength) && !$isSubjectLengthCorrect) {
+		if (isset($isSubjectLengthCorrect) && !is_null($subjectLength) && !$isSubjectLengthCorrect) {
 			throw new MailValidatorException('Длина темы превысила допустимые нормы.');
 		}
 	}

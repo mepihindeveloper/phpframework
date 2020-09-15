@@ -8,8 +8,9 @@
 
 declare(strict_types = 1);
 
-namespace kernel\exception;
+namespace kernel\exception\validator;
 
+use kernel\exception\ValidatorException;
 use Throwable;
 
 class EmailValidatorException extends ValidatorException {

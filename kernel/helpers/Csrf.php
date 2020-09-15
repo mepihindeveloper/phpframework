@@ -12,9 +12,9 @@ namespace kernel\helpers;
 
 use Exception;
 use kernel\Application;
-use kernel\exception\CsrfSecurityException;
-use kernel\exception\InvalidDataHttpException;
-use kernel\exception\SessionErrorHttpException;
+use kernel\exception\http\InvalidDataHttpException;
+use kernel\exception\http\SessionErrorHttpException;
+use kernel\exception\security\CsrfSecurityException;
 use kernel\KernelRegistry;
 use kernel\pattern\Singleton;
 

@@ -11,14 +11,14 @@ declare(strict_types = 1);
 namespace kernel\helpers;
 
 use kernel\Application;
-use kernel\exception\EmailValidatorException;
-use kernel\exception\FileErrorHttpException;
-use kernel\exception\ForbiddenHttpException;
-use kernel\exception\InvalidDataHttpException;
-use kernel\exception\MailValidatorException;
-use kernel\exception\NotFoundHttpException;
+use kernel\exception\http\FileErrorHttpException;
+use kernel\exception\http\ForbiddenHttpException;
+use kernel\exception\http\InvalidDataHttpException;
+use kernel\exception\http\NotFoundHttpException;
+use kernel\exception\http\ServerErrorHttpException;
 use kernel\exception\RemoteException;
-use kernel\exception\ServerErrorHttpException;
+use kernel\exception\validator\EmailValidatorException;
+use kernel\exception\validator\MailValidatorException;
 use kernel\helpers\file\File;
 use kernel\validators\MailValidator;
 
@@ -74,10 +74,10 @@ class Mail {
 	 * @param Email[] $recipients Массив объектов электронных адресов
 	 * @param array $sender Информация об отправителе ['name', 'email']
 	 *
-	 * @throws EmailValidatorException
 	 * @throws InvalidDataHttpException
 	 * @throws MailValidatorException
 	 * @throws ServerErrorHttpException
+	 * @throws EmailValidatorException
 	 */
 	public function __construct(MailValidator $validator, array $recipients, array $sender = []) {
 		$this->validator = $validator;
@@ -129,11 +129,11 @@ class Mail {
 	 * @param array $paths Список путей к файлам
 	 *
 	 * @return $this
-	 * @throws FileErrorHttpException
 	 * @throws ForbiddenHttpException
 	 * @throws InvalidDataHttpException
 	 * @throws NotFoundHttpException
 	 * @throws ServerErrorHttpException
+	 * @throws FileErrorHttpException
 	 */
 	public function addFiles(array $paths): Mail {
 		$this->withFiles = true;
@@ -174,20 +174,20 @@ class Mail {
 		$properties = get_object_vars($this);
 		
 		foreach ($properties as $propertyName => $propertyValue) {
-			if (!in_array($propertyName, ['multipart', 'withFiles']) && empty($propertyValue)) {
+			if (!array_key_exists($propertyName, ['multipart', 'withFiles']) && empty($propertyValue)) {
 				throw new InvalidDataHttpException("Ошибка формирования сообщения. Не возможно сформировать сообщение без {$propertyName}");
 			}
 		}
 		
 		$from = !array_key_exists('name', $this->sender) || is_null($this->sender['name']) ? $this->sender['email'] : $this->sender['name'] . "<" . $this->sender['email'] . ">";
-		$recipients = (count($this->recipients) > 1) ? join(", ", $this->recipients) : $this->recipients[0];
+		$recipients = (count($this->recipients) > 1) ? implode(", ", $this->recipients) : $this->recipients[0];
 		// Формирование заголовков сообщения
 		$headers[] = "Date: " . date("D, d.M.Y H:i:s") . " UT";
 		$headers[] = "Subject: =?" . $this->settings['smtpCharset'] . "?B?" . base64_encode($this->subject) . "=?=";
 		$headers[] = "MIME-Version: 1.0";
 		$headers[] = "From: " . $from;
 		$headers[] = "To: " . $recipients;
-		$headers[] = 'X-Mailer: PHP/' . phpversion();
+		$headers[] = 'X-Mailer: PHP/' . PHP_VERSION;
 		$headers[] = "Return-Path: " . $this->sender['email'];
 		$headers[] = $this->withFiles ? "Content-Type: multipart/mixed; boundary=\"{$this->boundary}" : "Content-type: text/html; charset=" . $this->settings['smtpCharset'];
 		$headers = implode("\r\n", $headers) . "\r\n";
@@ -220,32 +220,33 @@ class Mail {
 		}
 		
 		// Приветствие почтового сервера
-		fputs($smtpConnection, "EHLO " . $_SERVER["SERVER_NAME"] . "\r\n");
+		fwrite($smtpConnection, "EHLO " . $_SERVER["SERVER_NAME"] . "\r\n");
 		
 		if (!$this->getServerResponse($smtpConnection, "250")) {
-			fputs($smtpConnection, "HELO " . $_SERVER["SERVER_NAME"] . "\r\n");
-			if (!$this->getServerResponse($smtpConnection, "250")) {
-				fclose($smtpConnection);
-				throw new RemoteException("Ошибка приветствия EHLO и HELO");
-			}
+			fwrite($smtpConnection, "HELO " . $_SERVER["SERVER_NAME"] . "\r\n");
+		}
+		
+		if (!$this->getServerResponse($smtpConnection, "250")) {
+			fclose($smtpConnection);
+			throw new RemoteException("Ошибка приветствия EHLO и HELO");
 		}
 		
 		// Попытка авторизации
-		fputs($smtpConnection, "AUTH LOGIN\r\n");
+		fwrite($smtpConnection, "AUTH LOGIN\r\n");
 		
 		if (!$this->getServerResponse($smtpConnection, "334")) {
 			fclose($smtpConnection);
 			throw new RemoteException("Не получено разрешение на запрос авторизации");
 		}
 		
-		fputs($smtpConnection, base64_encode($this->settings['smtpUsername']) . "\r\n");
+		fwrite($smtpConnection, base64_encode($this->settings['smtpUsername']) . "\r\n");
 		
 		if (!$this->getServerResponse($smtpConnection, "334")) {
 			fclose($smtpConnection);
 			throw new RemoteException("Ошибка доступа к пользователю. Сервер не принял логин авторизации");
 		}
 		
-		fputs($smtpConnection, base64_encode($this->settings['smtpPassword']) . "\r\n");
+		fwrite($smtpConnection, base64_encode($this->settings['smtpPassword']) . "\r\n");
 		
 		if (!$this->getServerResponse($smtpConnection, "235")) {
 			fclose($smtpConnection);
@@ -253,7 +254,7 @@ class Mail {
 		}
 		
 		// Установка отправителя и получателя(ей) письма
-		fputs($smtpConnection, "MAIL FROM: {$from}\r\n");
+		fwrite($smtpConnection, "MAIL FROM: {$from}\r\n");
 		
 		if (!$this->getServerResponse($smtpConnection, "250")) {
 			fclose($smtpConnection);
@@ -263,7 +264,7 @@ class Mail {
 		$recipients = explode(',', $recipients);
 		
 		foreach ($recipients as $recipient) {
-			fputs($smtpConnection, "RCPT TO: <{$recipient}>" . "\r\n");
+			fwrite($smtpConnection, "RCPT TO: <{$recipient}>" . "\r\n");
 			if (!$this->getServerResponse($smtpConnection, "250")) {
 				fclose($smtpConnection);
 				throw new RemoteException("Ошибка проверки получателей. Сервер не принял команду RCPT TO");
@@ -271,7 +272,7 @@ class Mail {
 		}
 		
 		// Проверка данных письма
-		fputs($smtpConnection, "DATA\r\n");
+		fwrite($smtpConnection, "DATA\r\n");
 		
 		if (!$this->getServerResponse($smtpConnection, "354")) {
 			fclose($smtpConnection);
@@ -279,7 +280,7 @@ class Mail {
 		}
 		
 		// Подготова и проверка тела сообщения
-		fputs($smtpConnection, $message . "\r\n.\r\n");
+		fwrite($smtpConnection, $message . "\r\n.\r\n");
 		
 		if (!$this->getServerResponse($smtpConnection, "250")) {
 			fclose($smtpConnection);
@@ -287,7 +288,7 @@ class Mail {
 		}
 		
 		// Разрыв аутентификации с почтовым сервером
-		fputs($smtpConnection, "QUIT\r\n");
+		fwrite($smtpConnection, "QUIT\r\n");
 		fclose($smtpConnection);
 	}
 	
@@ -306,8 +307,8 @@ class Mail {
 			if (!($serverResponse = fgets($socket, 256))) {
 				return false;
 			}
-		} while (substr($serverResponse, 3, 1) != ' ');
+		} while ($serverResponse[3] !== ' ');
 		
-		return (substr($serverResponse, 0, 3) === $response);
+		return (strpos($serverResponse, $response) === 0);
 	}
 }

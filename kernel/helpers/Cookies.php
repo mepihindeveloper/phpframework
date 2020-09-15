@@ -11,7 +11,7 @@ declare(strict_types = 1);
 namespace kernel\helpers;
 
 use kernel\Config;
-use kernel\exception\InvalidDataHttpException;
+use kernel\exception\http\InvalidDataHttpException;
 use kernel\pattern\Singleton;
 
 /**

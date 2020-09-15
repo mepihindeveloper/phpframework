@@ -21,16 +21,16 @@ use const STDOUT;
  */
 class Console {
 	
-	const FG_WHITE = 0;
-	const FG_RED = 31;
-	const FG_GREEN = 32;
-	const FONT_NORMAL = 0;
-	const FONT_BOLD = 1;
+	public const FG_WHITE = 0;
+	public const FG_RED = 31;
+	public const FG_GREEN = 32;
+	public const FONT_NORMAL = 0;
+	public const FONT_BOLD = 1;
 	
 	/**
 	 * Очищает экран консоли
 	 */
-	public static function clearScreen() {
+	public static function clearScreen(): void {
 		echo "\033[2J";
 	}
 	
@@ -95,14 +95,17 @@ class Console {
 			static::write($message . ' (y|n) [' . ($default ? 'y' : 'n') . ']: ');
 			$input = strtolower(trim(static::readLine()));
 			
-			if (empty($input))
+			if (empty($input)) {
 				return $default;
+			}
 			
-			if (!strcasecmp($input, 'y'))
+			if (!strcasecmp($input, 'y')) {
 				return true;
+			}
 			
-			if (!strcasecmp($input, 'n'))
+			if (!strcasecmp($input, 'n')) {
 				return false;
+			}
 		}
 	}
 	

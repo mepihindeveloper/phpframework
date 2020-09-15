@@ -11,9 +11,9 @@ declare(strict_types = 1);
 namespace kernel\helpers;
 
 use kernel\Application;
-use kernel\exception\InvalidDataHttpException;
-use kernel\exception\ServerErrorHttpException;
-use kernel\exception\SessionErrorHttpException;
+use kernel\exception\http\InvalidDataHttpException;
+use kernel\exception\http\ServerErrorHttpException;
+use kernel\exception\http\SessionErrorHttpException;
 use kernel\pattern\Singleton;
 
 /**
@@ -84,7 +84,7 @@ class Session extends Singleton {
 	 * @throws ServerErrorHttpException
 	 * @throws SessionErrorHttpException
 	 */
-	public function start(string $name = 'appsession') {
+	public function start(string $name = 'appsession'): void {
 		$this->name = $name;
 		$this->application = Application::getInstance();
 		$this->activeSettings = $this->application->getConfig()->getActiveSettings('session');
@@ -209,10 +209,13 @@ class Session extends Singleton {
 	 * @throws SessionErrorHttpException
 	 */
 	public function isIdExpired(): bool {
-		if ($this->idLifeTime === '0')
+		if ($this->idLifeTime === '0') {
 			return false;
+		}
 		
-		$refreshLastTime = $this->hasKey('refreshLastTime', 'activity') ? $this->get('refreshLastTime', 'activity') : false;
+		$refreshLastTime = $this->hasKey('refreshLastTime', 'activity')
+			? $this->get('refreshLastTime', 'activity')
+			: false;
 		
 		return (!$refreshLastTime || (time() - $refreshLastTime) > $this->idLifeTime);
 	}
@@ -389,7 +392,7 @@ class Session extends Singleton {
 	 *
 	 * @throws SessionErrorHttpException
 	 */
-	public function getName() {
+	public function getName(): string {
 		if (!$this->isActive()) {
 			throw new SessionErrorHttpException('Ошибка в работе сессий. Сессия не запущена.');
 		}

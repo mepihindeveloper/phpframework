@@ -8,8 +8,9 @@
 
 declare(strict_types = 1);
 
-namespace kernel\exception;
+namespace kernel\exception\security;
 
+use kernel\exception\SecurityException;
 use Throwable;
 
 class CsrfSecurityException extends SecurityException {

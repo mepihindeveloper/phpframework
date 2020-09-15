@@ -8,7 +8,7 @@ use kernel\helpers\Console;
 use kernel\helpers\migration\Migration;
 
 $action = 'action' . $argv[1];
-$params = array_key_exists(2, $argv) ? $argv[2] : null;
+$params = $argv[2] ?? null;
 $migration = new Migration();
 
 if (!method_exists($migration, $action)) {

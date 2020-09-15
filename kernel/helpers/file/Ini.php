@@ -10,8 +10,8 @@ declare(strict_types = 1);
 
 namespace kernel\helpers\file;
 
-use kernel\exception\InvalidDataHttpException;
-use kernel\exception\ServerErrorHttpException;
+use kernel\exception\http\InvalidDataHttpException;
+use kernel\exception\http\ServerErrorHttpException;
 
 /**
  * Касс-помощник для работы с INI файлами.
@@ -31,7 +31,7 @@ class Ini extends File {
 	/**
 	 * @var int Тип сканирования
 	 */
-	private int $scannerMode = INI_SCANNER_TYPED;
+	private int $scannerMode;
 	
 	/**
 	 * Ini constructor.

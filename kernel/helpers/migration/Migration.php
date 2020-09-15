@@ -13,10 +13,10 @@ namespace kernel\helpers\migration;
 use DateTime;
 use kernel\Application;
 use kernel\exception\DatabaseException;
-use kernel\exception\FileErrorHttpException;
-use kernel\exception\InvalidDataHttpException;
+use kernel\exception\http\FileErrorHttpException;
+use kernel\exception\http\InvalidDataHttpException;
+use kernel\exception\http\ServerErrorHttpException;
 use kernel\exception\MigrationException;
-use kernel\exception\ServerErrorHttpException;
 use kernel\helpers\Console;
 use kernel\helpers\database\Database;
 use kernel\helpers\Dir;
@@ -103,8 +103,8 @@ class Migration {
 	 *
 	 * @param string $name Название миграции
 	 *
-	 * @throws MigrationException
 	 * @throws InvalidDataHttpException
+	 * @throws MigrationException
 	 * @throws ServerErrorHttpException
 	 */
 	public function actionCreate(string $name): void {
@@ -231,9 +231,9 @@ class Migration {
 	 */
 	public function actionUp(string $count = null): void {
 		$migrationsUnappliedList = $this->getUnappliedMigrationList();
-		$migrationsCountToApplie = is_null($count) ? count($migrationsUnappliedList) : (int)$count;
+		$migrationsCountToApply = is_null($count) ? count($migrationsUnappliedList) : (int)$count;
 		
-		for ($migrationIndex = 0; $migrationIndex < $migrationsCountToApplie; $migrationIndex++) {
+		for ($migrationIndex = 0; $migrationIndex < $migrationsCountToApply; $migrationIndex++) {
 			$migration = $migrationsUnappliedList[$migrationIndex];
 			$migrationBody = (new File("{$migration['path']}/up.sql"))->getContent();
 			
