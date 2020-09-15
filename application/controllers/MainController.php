@@ -12,6 +12,12 @@ namespace application\controllers;
 
 use kernel\pattern\mvc\Controller;
 
+/**
+ * Класс MainController.
+ * Базовый класс домашней страницы.
+ *
+ * @package application\controllers
+ */
 class MainController extends Controller {
 	
 	public function actionIndex(): void {

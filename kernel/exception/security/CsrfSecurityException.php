@@ -13,8 +13,17 @@ namespace kernel\exception\security;
 use kernel\exception\SecurityException;
 use Throwable;
 
+/**
+ * Класс CsrfSecurityException.
+ * Класс исключений при работе с CSRF токеном.
+ *
+ * @package kernel\exception\security
+ */
 class CsrfSecurityException extends SecurityException {
 	
+	/**
+	 * @inheritdoc
+	 */
 	public function __construct($message = "", $code = 0, Throwable $previous = null) {
 		parent::__construct(500, $message, $code, $previous);
 	}

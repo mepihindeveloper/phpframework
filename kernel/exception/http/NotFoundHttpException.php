@@ -13,8 +13,17 @@ namespace kernel\exception\http;
 use kernel\exception\HttpException;
 use Throwable;
 
+/**
+ * Класс NotFoundHttpException.
+ * Класс исключений при невозможности найти что-либо.
+ *
+ * @package kernel\exception\http
+ */
 class NotFoundHttpException extends HttpException {
 	
+	/**
+	 * @inheritdoc
+	 */
 	public function __construct($message = "", $code = 0, Throwable $previous = null) {
 		parent::__construct(404, $message, $code, $previous);
 	}

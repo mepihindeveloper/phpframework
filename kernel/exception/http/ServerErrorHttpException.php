@@ -13,8 +13,17 @@ namespace kernel\exception\http;
 use kernel\exception\HttpException;
 use Throwable;
 
+/**
+ * Класс ServerErrorHttpException.
+ * Класс исключений общих серверных ошибок исполнения скриптов (классический вариант 500 ошибки).
+ *
+ * @package kernel\exception\http
+ */
 class ServerErrorHttpException extends HttpException {
 	
+	/**
+	 * @inheritdoc
+	 */
 	public function __construct($message = "", $code = 0, Throwable $previous = null) {
 		parent::__construct(500, $message, $code, $previous);
 	}
