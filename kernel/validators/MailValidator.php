@@ -31,9 +31,9 @@ class MailValidator extends Validator {
 	 */
 	public function validateSubject(string $subject): void {
 		$subjectLength = $this->settings['mail']['subjectLength'] ?? null;
-		$isSubjectLengthCorrect = !(mb_strlen($subject) > $subjectLength);
+		$subjectLengthIsCorrect = !(mb_strlen($subject) > $subjectLength);
 		
-		if (isset($isSubjectLengthCorrect) && !is_null($subjectLength) && !$isSubjectLengthCorrect) {
+		if (!$subjectLengthIsCorrect) {
 			throw new MailValidatorException('Длина темы превысила допустимые нормы.');
 		}
 	}
