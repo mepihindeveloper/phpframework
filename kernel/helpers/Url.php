@@ -46,7 +46,7 @@ class Url {
 		$normalizedAttributes = [];
 		
 		foreach (['controller', 'action'] as $requiredAttribute) {
-			if (!array_key_exists($requiredAttribute, array_keys($routerAttributes))) {
+			if (!array_key_exists($requiredAttribute, $routerAttributes)) {
 				$normalizedAttributes[$requiredAttribute] = $application->getRouter()->getDefaultProperty($requiredAttribute);
 			} else {
 				$normalizedAttributes[$requiredAttribute] = ($routerAttributes[$requiredAttribute]);

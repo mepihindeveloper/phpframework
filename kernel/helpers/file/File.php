@@ -92,7 +92,7 @@ class File {
 	 * @return bool
 	 */
 	public function isAllowedExtension(string $extension): bool {
-		return array_key_exists(strtolower($extension), array_keys($this->settings['formats']));
+		return array_key_exists(strtolower($extension), $this->settings['formats']);
 	}
 	
 	/**

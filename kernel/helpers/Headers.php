@@ -64,7 +64,7 @@ class Headers extends Singleton {
 	 */
 	public function add(array $params): void {
 		foreach ($params as $header => $value) {
-			$headerExists = array_key_exists($header, array_keys($this->headers));
+			$headerExists = array_key_exists($header, $this->headers);
 			$this->headers[$header] = $value;
 			
 			header("{$header}: {$value}", $headerExists);
