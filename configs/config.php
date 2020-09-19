@@ -3,28 +3,7 @@
  *
  * Разработчик: Максим Епихин
  * Twitter: https://twitter.com/maximepihin
- */ /** @noinspection UsingInclusionOnceReturnValueInspection */
-/** @noinspection UsingInclusionOnceReturnValueInspection */
-/** @noinspection UsingInclusionOnceReturnValueInspection */
-/** @noinspection UsingInclusionOnceReturnValueInspection */
-/** @noinspection UsingInclusionOnceReturnValueInspection */
-/** @noinspection UsingInclusionOnceReturnValueInspection */
-/** @noinspection UsingInclusionOnceReturnValueInspection */
-/** @noinspection UsingInclusionOnceReturnValueInspection */
-/** @noinspection UsingInclusionOnceReturnValueInspection */
-/** @noinspection UsingInclusionOnceReturnValueInspection */
-/** @noinspection UsingInclusionOnceReturnValueInspection */
-/** @noinspection ALL */
-/** @noinspection ALL */
-/** @noinspection ALL */
-/** @noinspection ALL */
-/** @noinspection ALL */
-/** @noinspection ALL */
-/** @noinspection ALL */
-/** @noinspection ALL */
-/** @noinspection ALL */
-/** @noinspection ALL */
-/** @noinspection ALL */
+ */
 /**
  * Файл конфигурации.
  *
@@ -32,20 +11,11 @@
  * настроки приложения.
  */
 /** @noinspection UsingInclusionOnceReturnValueInspection */
-/** @noinspection UsingInclusionOnceReturnValueInspection */
-/** @noinspection UsingInclusionOnceReturnValueInspection */
-/** @noinspection UsingInclusionOnceReturnValueInspection */
-/** @noinspection UsingInclusionOnceReturnValueInspection */
-/** @noinspection UsingInclusionOnceReturnValueInspection */
-/** @noinspection UsingInclusionOnceReturnValueInspection */
-/** @noinspection UsingInclusionOnceReturnValueInspection */
-/** @noinspection UsingInclusionOnceReturnValueInspection */
-/** @noinspection UsingInclusionOnceReturnValueInspection */
-/** @noinspection UsingInclusionOnceReturnValueInspection */
 return [
 	'appType' => 'develop',
 	'language' => 'ru',
 	'friendlyUrl' => true,
+	'resourceRoot' => '/resources/',
 	'database' => require 'database.php',
 	'urls' => require 'url.php',
 	'cookies' => require 'cookie.php',
