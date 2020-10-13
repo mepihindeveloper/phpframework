@@ -152,6 +152,18 @@ class Request extends Singleton {
 	}
 	
 	/**
+	 * Получает данные в зависимости от метода запроса: get или post.
+	 *
+	 * @param string $key
+	 *
+	 * @return array|mixed
+	 * @throws InvalidDataHttpException
+	 */
+	public function data(string $key = '') {
+		return $this->isGet() ? $this->get($key) : $this->post($key);
+	}
+	
+	/**
 	 * Получает имя хоста другого конца этого соединения. Заголовки игнорируются
 	 *
 	 * @return string|null
