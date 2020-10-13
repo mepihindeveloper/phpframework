@@ -50,9 +50,9 @@ use kernel\pattern\Singleton;
 class Router extends Singleton {
 	
 	/**
-	 * @var string|null Наименование модуля по умолчанию
+	 * @var string Наименование модуля по умолчанию
 	 */
-	private ?string $defaultModule = null;
+	private string $defaultModule = '';
 	/**
 	 * @var string Наименование контроллера по умолчанию
 	 */
@@ -62,9 +62,9 @@ class Router extends Singleton {
 	 */
 	private string $defaultAction = 'index';
 	/**
-	 * @var string|null Наименование модуля
+	 * @var string Наименование модуля
 	 */
-	private ?string $moduleName;
+	private string $moduleName;
 	/**
 	 * @var string Наименование контроллера
 	 */
@@ -268,7 +268,7 @@ class Router extends Singleton {
 		
 		require_once $controllerFile;
 		
-		$controllerClass = 'application\\controllers\\' . (is_null($this->moduleName)
+		$controllerClass = 'application\\controllers\\' . (empty($this->moduleName)
 				? $this->controllerName
 				: "{$this->moduleName}\\{$this->controllerName}");
 		$this->controllerObject = new $controllerClass;

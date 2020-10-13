@@ -30,9 +30,9 @@ class File {
 	 */
 	protected File $file;
 	/**
-	 * @var string|null Путь к файлу
+	 * @var string Путь к файлу
 	 */
-	protected ?string $path;
+	protected string $path = '';
 	/**
 	 * @var array Настройки активного профиля
 	 */

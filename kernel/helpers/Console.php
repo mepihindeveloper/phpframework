@@ -37,12 +37,12 @@ class Console {
 	/**
 	 * Записывает строку с переносом
 	 *
-	 * @param string|null $string Строка для записи
+	 * @param string $string Строка для записи
 	 * @param int $color Цвет шрифта
 	 *
 	 * @return false|int
 	 */
-	public static function writeLine(string $string = null, int $color = self::FG_WHITE) {
+	public static function writeLine(string $string = '', int $color = self::FG_WHITE) {
 		return static::write($string . PHP_EOL, $color);
 	}
 	
@@ -63,11 +63,11 @@ class Console {
 	/**
 	 * Записывает строку ошибки с переносом
 	 *
-	 * @param string|null $string Строка для записи
+	 * @param string $string Строка для записи
 	 *
 	 * @return false|int
 	 */
-	public static function writeLineError(string $string = null) {
+	public static function writeLineError(string $string = '') {
 		return static::writeError($string . PHP_EOL);
 	}
 	

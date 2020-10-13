@@ -13,6 +13,18 @@ namespace kernel\helpers;
 use kernel\KernelRegistry;
 use kernel\pattern\Singleton;
 
+/**
+ * Класс реализующий работу с ассетами проекта.
+ * Класс является наследний шаблона проектирования "Одиночка" (Singleton).
+ *
+ * При создании ассета объявляются публичные статичные свойства $css и $js. По умолчанию значения свойств пусты. В них
+ * прописываются варианты значений:
+ * 1. пары ключ => значение, где значение является массивом. Значение - свойства, атрибуты тега
+ * 2. значение - подключение со свойствами по умолчанию
+ * 3. секция => [1/2], где 1/2 это варианты работы соответсвующие 1 или 2 варианту значений выше.
+ *
+ * @package kernel\helpers
+ */
 class Asset extends Singleton {
 	
 	public const TYPE_CSS = 'css';
@@ -58,16 +70,16 @@ class Asset extends Singleton {
 	 * Регистрирует html код для подключаемых файлов ресурсов
 	 *
 	 * @param string $type Тип файла подключения. Выбирается из TYPE_CSS и TYPE_JS
-	 * @param string|null $section Секция подключения
+	 * @param string $section Секция подключения
 	 *
 	 * @return string
 	 */
-	public static function register(string $type, ?string $section = null): string {
+	public static function register(string $type, string $section = ''): string {
 		$assetClass = static::class;
 		$asset = new $assetClass;
 		self::$resourceRoot = $asset::$resourceRoot;
 		self::$map = ['css' => $asset->css, 'js' => $asset->js];
-		$map = is_null($section) ? self::$map[$type] : self::$map[$type][$section];
+		$map = empty($section) ? self::$map[$type] : self::$map[$type][$section];
 		$html = '';
 		
 		foreach ($map as $key => $value) {

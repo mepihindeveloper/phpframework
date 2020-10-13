@@ -132,23 +132,23 @@ class Request extends Singleton {
 	/**
 	 * Получает параметр GET с заданным именем. Если имя не указано, Получает массив всех параметров GET
 	 *
-	 * @param string|null $key Ключ
+	 * @param string $key Ключ
 	 *
 	 * @return mixed
 	 */
-	public function get(string $key = null) {
-		return is_null($key) ? $_GET : $_GET[$key];
+	public function get(string $key = '') {
+		return empty($key) ? $_GET : $_GET[$key];
 	}
 	
 	/**
 	 * Получает параметр POST с заданным именем. Если имя не указано, Получает массив всех параметров POST
 	 *
-	 * @param string|null $key Ключ
+	 * @param string $key Ключ
 	 *
 	 * @return mixed
 	 */
-	public function post(string $key = null) {
-		return is_null($key) ? $_POST : $_POST[$key];
+	public function post(string $key = '') {
+		return empty($key) ? $_POST : $_POST[$key];
 	}
 	
 	/**

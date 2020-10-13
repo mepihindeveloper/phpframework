@@ -72,13 +72,13 @@ class Config extends Singleton {
 	 * Проверяет наличие секции и/или профиля в конфигурации
 	 *
 	 * @param string $section Секция конфигурации
-	 * @param string|null $profile Профиль конфигурации. Если указано значение <b>null</b>, то проверяется толькое
+	 * @param string $profile Профиль конфигурации. Если указано значение <b>null</b>, то проверяется толькое
 	 * наличие секции
 	 *
 	 * @return bool
 	 */
-	public function has(string $section, string $profile = null): bool {
-		return is_null($profile) ?
+	public function has(string $section, string $profile = ''): bool {
+		return empty($profile) ?
 			array_key_exists($section, $this->config) && isset($this->config[$section]) :
 			array_key_exists($section, $this->config) && isset($this->config[$section][$profile]);
 	}

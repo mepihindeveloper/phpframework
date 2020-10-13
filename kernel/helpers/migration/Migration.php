@@ -137,11 +137,11 @@ class Migration {
 	/**
 	 * Выводит на экран список примененных миграций
 	 *
-	 * @param int|null $limit Ограничение длины списка (null - полный список)
+	 * @param int $limit Ограничение длины списка (null - полный список)
 	 *
 	 * @throws DatabaseException
 	 */
-	public function actionHistory(int $limit = null): void {
+	public function actionHistory(int $limit = 0): void {
 		$migrationsList = $this->getMigrationHistory($limit);
 		
 		if (empty($migrationsList)) {
@@ -157,13 +157,13 @@ class Migration {
 	/**
 	 * Возвращает список примененных миграций
 	 *
-	 * @param int|null $limit Ограничение длины списка миграций (null - полный список)
+	 * @param int $limit Ограничение длины списка миграций (null - полный список)
 	 *
 	 * @return array Список примененных миграций
 	 * @throws DatabaseException
 	 */
-	private function getMigrationHistory(int $limit = null): array {
-		$limitSql = is_null($limit) ? '' : "LIMIT {$limit}";
+	private function getMigrationHistory(int $limit = 0): array {
+		$limitSql = $limit === 0 ? '' : "LIMIT {$limit}";
 		$sql = "SELECT name, apply_time FROM {$this->settings['table']} ORDER BY apply_time DESC, \"name\" DESC {$limitSql}";
 		
 		return $this->database->queryAll($sql);
@@ -224,14 +224,14 @@ class Migration {
 	/**
 	 * Применяет указанное количество миграций
 	 *
-	 * @param string|null $count Количество применяемых миграция (null - применить все)
+	 * @param string $count Количество применяемых миграция (null - применить все)
 	 *
 	 * @throws DatabaseException
 	 * @throws FileErrorHttpException
 	 */
-	public function actionUp(string $count = null): void {
+	public function actionUp(string $count = ''): void {
 		$migrationsUnappliedList = $this->getUnappliedMigrationList();
-		$migrationsCountToApply = is_null($count) ? count($migrationsUnappliedList) : (int)$count;
+		$migrationsCountToApply = empty($count) ? count($migrationsUnappliedList) : (int)$count;
 		
 		for ($migrationIndex = 0; $migrationIndex < $migrationsCountToApply; $migrationIndex++) {
 			$migration = $migrationsUnappliedList[$migrationIndex];
@@ -263,14 +263,14 @@ class Migration {
 	/**
 	 * Отменяет указанное количество миграций
 	 *
-	 * @param string|null $count Количество отменяемых миграция (null - отменить все)
+	 * @param string $count Количество отменяемых миграция (null - отменить все)
 	 *
 	 * @throws DatabaseException
 	 * @throws FileErrorHttpException
 	 */
-	public function actionDown(string $count = null): void {
+	public function actionDown(string $count = ''): void {
 		$migrationsApplied = $this->getMigrationHistory();
-		$migrationsDownCount = is_null($count) ? count($migrationsApplied) : (int)$count;
+		$migrationsDownCount = empty($count) ? count($migrationsApplied) : (int)$count;
 		
 		for ($migrationIndex = 0; $migrationIndex < $migrationsDownCount; $migrationIndex++) {
 			$migration = $migrationsApplied[$migrationIndex];

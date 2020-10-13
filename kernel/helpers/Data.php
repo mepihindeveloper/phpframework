@@ -25,11 +25,11 @@ class Data {
 	 *
 	 * @param string $data Конвертируемая строка
 	 * @param int $specialCharsFlags Битовая маска
-	 * @param string|null $encoding Кодировка при конвертации симоволов
+	 * @param string $encoding Кодировка при конвертации симоволов
 	 *
 	 * @return string
 	 */
-	public static function secureHtmlChars(string $data, int $specialCharsFlags = ENT_QUOTES | ENT_HTML5, string $encoding = null): string {
+	public static function secureHtmlChars(string $data, int $specialCharsFlags = ENT_QUOTES | ENT_HTML5, string $encoding = ''): string {
 		$charset = $encoding ?? ini_get("default_charset");
 		
 		return htmlspecialchars($data, $specialCharsFlags, $charset);
@@ -42,11 +42,11 @@ class Data {
 	 *
 	 * @param string $data Конвертируемая строка
 	 * @param int $specialCharsFlags Битовая маска
-	 * @param string|null $encoding Кодировка при конвертации симоволов
+	 * @param string $encoding Кодировка при конвертации симоволов
 	 *
 	 * @return string
 	 */
-	public static function secureHtmlEntities(string $data, int $specialCharsFlags = ENT_QUOTES | ENT_HTML5, string $encoding = null): string {
+	public static function secureHtmlEntities(string $data, int $specialCharsFlags = ENT_QUOTES | ENT_HTML5, string $encoding = ''): string {
 		$charset = $encoding ?? ini_get("default_charset");
 		
 		return htmlentities($data, $specialCharsFlags, $charset);
@@ -80,11 +80,11 @@ class Data {
 	 * @see https://www.php.net/manual/ru/function.trim.php trim
 	 *
 	 * @param string $data Обрезаемая строка
-	 * @param string|null $charset Список символов для удаления
+	 * @param string $charset Список символов для удаления
 	 *
 	 * @return string
 	 */
-	public static function trim(string $data, string $charset = null): string {
-		return is_null($charset) ? trim($data) : trim($data, $charset);
+	public static function trim(string $data, string $charset = ''): string {
+		return empty($charset) ? trim($data) : trim($data, $charset);
 	}
 }
